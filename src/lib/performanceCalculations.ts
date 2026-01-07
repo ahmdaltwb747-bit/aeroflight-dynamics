@@ -288,15 +288,19 @@ function performCalculations(
   const Theta_RCmax = Math.asin(RCmax / V_RCmax) * (180 / Math.PI);
   const RC_ThetaMax = V_ThetaMax * Math.sin(ThetaMax * Math.PI / 180);
 
-  // Aerodynamic relations
+  // Aerodynamic relations (matching MATLAB formulas)
+  // CLCDMAX = 1/sqrt(4*K*Cd0)
   const CLCD_max = 1 / Math.sqrt(4 * K * Cd0);
   const V_CLCD_max = VTRmin;
   
-  const CL_1p5_CD_max = 0.75 * Math.pow(1 / K, 0.75) * Math.pow(1 / Cd0, 0.25);
+  // CL_3_2 = 0.25*([3/K/(Cd0^(1/3))]^0.75)
+  const CL_1p5_CD_max = 0.25 * Math.pow(3 / K / Math.pow(Cd0, 1/3), 0.75);
   const V_CL_1p5_CD_max = VPRmin;
   
-  const CL_0p5_CD_max = 0.5 * Math.pow(1 / Cd0, 0.5) * Math.pow(1 / K, 0.25);
-  const V_CL_0p5_CD_max = Math.pow((2 / rho) * (W / S) * Math.sqrt(3 * K / Cd0), 0.5);
+  // CL_0_5 = 3/4*(1/3/K/Cd0/Cd0/Cd0)^(0.25)
+  const CL_0p5_CD_max = 0.75 * Math.pow(1 / (3 * K * Cd0 * Cd0 * Cd0), 0.25);
+  // V_0_5 = (2*W/rho/S*sqrt(K*3/Cd0))^0.5
+  const V_CL_0p5_CD_max = Math.pow((2 * W / rho / S) * Math.sqrt(3 * K / Cd0), 0.5);
 
   // Gliding performance
   const Theta_min_glide = -Math.atan(1 / CLCD_max) * (180 / Math.PI);
@@ -337,9 +341,10 @@ function performCalculations(
   const a_ceiling = RC_max_sl;
   const b_ceiling = (RCmax - RC_max_sl) / h;
   
-  // Service ceiling: RC = 100 ft/min = 1.667 ft/s
-  const serviceCeiling = b_ceiling !== 0 ? (1.667 - a_ceiling) / b_ceiling : 0;
-  // Absolute ceiling: RC = 0
+  // Service ceiling: RC = 100 ft/min = 5/3 ft/s (MATLAB uses 5/3)
+  // hService = (5/3-a)/b
+  const serviceCeiling = b_ceiling !== 0 ? (5/3 - a_ceiling) / b_ceiling : 0;
+  // Absolute ceiling: RC = 0, hAbsolute = -a/b
   const absoluteCeiling = b_ceiling !== 0 ? -a_ceiling / b_ceiling : 0;
 
   return {
