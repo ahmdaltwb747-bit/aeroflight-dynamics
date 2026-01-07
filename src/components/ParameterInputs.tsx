@@ -19,7 +19,7 @@ interface InputFieldProps {
 
 function InputField({ label, id, value, unit, step = "1", onChange }: InputFieldProps) {
   return (
-    <div>
+    <div className="space-y-2">
       <label htmlFor={id} className="data-label">{label}</label>
       <div className="relative">
         <input
@@ -28,10 +28,10 @@ function InputField({ label, id, value, unit, step = "1", onChange }: InputField
           value={value}
           step={step}
           onChange={(e) => onChange(id, parseFloat(e.target.value) || 0)}
-          className="input-aviation pr-12"
+          className="input-aviation pr-16"
         />
         {unit && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-primary/70 bg-secondary/50 px-2 py-0.5 rounded">
             {unit}
           </span>
         )}
