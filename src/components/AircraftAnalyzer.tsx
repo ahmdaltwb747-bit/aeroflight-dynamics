@@ -31,6 +31,7 @@ export interface InputValues {
   eta: number;
   Ne: number;
   m: number;
+  jetRatio: number;  // Jet Power Ratio
 }
 
 const defaultValues: InputValues = {
@@ -47,6 +48,7 @@ const defaultValues: InputValues = {
   eta: 0.85,
   Ne: 2,
   m: 0.6,
+  jetRatio: 0.05,
 };
 
 export function AircraftAnalyzer() {
@@ -82,6 +84,7 @@ export function AircraftAnalyzer() {
         eta: inputs.eta,
         Ne: inputs.Ne,
         m: inputs.m,
+        jetRatio: inputs.jetRatio,
       };
       return calculateTurbopropPerformance(params);
     }
