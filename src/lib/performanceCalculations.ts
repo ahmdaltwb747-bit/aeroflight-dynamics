@@ -108,6 +108,7 @@ export interface GlideDataPoint {
   V_v: number;
   Theta: number;
   RD: number;
+  ET_glide: number;  // ET_glide = -TR
 }
 
 function calculateThrustRequired(V: number, rho: number, S: number, W: number, Cd0: number, K: number): number {
@@ -248,7 +249,7 @@ function performCalculations(
     const V_h_glide = V * Math.cos(Theta_glide * Math.PI / 180);
     const RD = -V_v_glide;
 
-    glideData.push({ V, V_h: V_h_glide, V_v: V_v_glide, Theta: Theta_glide, RD });
+    glideData.push({ V, V_h: V_h_glide, V_v: V_v_glide, Theta: Theta_glide, RD, ET_glide });
 
     // Track max RC and max Theta (above stall)
     if (V >= Vstall && V <= Vmax) {
