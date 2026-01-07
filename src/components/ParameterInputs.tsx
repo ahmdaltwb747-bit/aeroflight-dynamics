@@ -91,8 +91,9 @@ export function ParameterInputs({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <InputField label="Prop Efficiency (η)" id="eta" value={inputs.eta} step="0.01" onChange={handleChange} />
-              <InputField label="Alt. Power Exp (m)" id="m" value={inputs.m} step="0.1" onChange={handleChange} />
+              <InputField label="Jet Power Ratio" id="jetRatio" value={inputs.jetRatio} step="0.01" onChange={handleChange} />
             </div>
+            <InputField label="Alt. Power Exp (m)" id="m" value={inputs.m} step="0.1" onChange={handleChange} />
           </div>}
       </div>
 

@@ -20,6 +20,7 @@ export interface TurbopropParams extends AircraftParams {
   eta: number;    // Propeller efficiency
   Ne: number;     // Number of engines
   m: number;      // Altitude power exponent
+  jetRatio: number; // Jet Power Ratio
 }
 
 export interface PerformanceResults {
@@ -160,7 +161,7 @@ export function calculateTurbofanPerformance(params: TurbofanParams): Performanc
 }
 
 export function calculateTurbopropPerformance(params: TurbopropParams): PerformanceResults {
-  const { W, S, Cd0, K, CLmax, h, Psh, eta, Ne, m } = params;
+  const { W, S, Cd0, K, CLmax, h, Psh, eta, Ne, m, jetRatio } = params;
   
   // Atmosphere
   const atm = getAtmosphere(h);
@@ -168,14 +169,16 @@ export function calculateTurbopropPerformance(params: TurbopropParams): Performa
   const { rho, T, sigma, h_m } = atm;
 
   // Power available (Turboprop - n=1)
+  // effective_eff = eta_prop + jet_ratio (matching HTML code)
   const P_total = Psh * Ne;
   const altitudeFactor = Math.pow(sigma, m);
-  const P_avail_alt = P_total * eta * altitudeFactor;
+  const effective_eff = eta + jetRatio;
+  const P_avail_alt = P_total * effective_eff * altitudeFactor;
   const C = P_avail_alt * 550;
   const n = 1.0;
 
   // Sea level C
-  const P_avail_sl = P_total * eta;
+  const P_avail_sl = P_total * effective_eff;
   const C_sl = P_avail_sl * 550;
 
   return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho);
