@@ -80,9 +80,10 @@ export function ParameterInputs({
                 * Per Engine (×2 internally)
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <InputField label="n (Index)" id="n" value={inputs.n} step="0.1" onChange={handleChange} />
               <InputField label="Atm. Coeff (A)" id="A" value={inputs.A} step="0.1" onChange={handleChange} />
+              <InputField label="Alt. Power Exp (m)" id="m" value={inputs.m} step="0.1" onChange={handleChange} />
             </div>
           </div> : <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
