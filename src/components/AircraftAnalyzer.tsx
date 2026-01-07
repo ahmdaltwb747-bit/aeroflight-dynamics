@@ -4,6 +4,7 @@ import { ParameterInputs } from './ParameterInputs';
 import { MetricsCards } from './MetricsCards';
 import { PerformanceCharts } from './PerformanceCharts';
 import { ResultsPanel } from './ResultsPanel';
+import { PerformanceTables } from './PerformanceTables';
 import {
   calculateTurbofanPerformance,
   calculateTurbopropPerformance,
@@ -183,6 +184,7 @@ export function AircraftAnalyzer() {
               <>
                 <MetricsCards results={results} mode={mode} />
                 <PerformanceCharts results={results} mode={mode} />
+                <PerformanceTables results={results} mode={mode} />
                 <ResultsPanel results={results} mode={mode} />
               </>
             ) : (
