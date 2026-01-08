@@ -87,6 +87,9 @@ export interface PerformanceResults {
   // Stall warnings
   stallInRCmax: boolean;
   stallInThetaMax: boolean;
+  
+  // Engine type
+  isTurboprop: boolean;
 }
 
 export interface ChartDataPoint {
@@ -158,7 +161,7 @@ export function calculateTurbofanPerformance(params: TurbofanParams): Performanc
   const a_sound_sl = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * PHYSICS.T_sl);
   const C_sl = T_sl_total * A * Math.pow(a_sound_sl, n);
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, false);
 }
 
 export function calculateTurbopropPerformance(params: TurbopropParams): PerformanceResults {
@@ -169,26 +172,31 @@ export function calculateTurbopropPerformance(params: TurbopropParams): Performa
   const atmSL = getSeaLevelAtmosphere();
   const { rho, T, sigma, h_m } = atm;
 
-  // Power available (Turboprop - n=1)
-  // effective_eff = eta_prop + jet_ratio (matching HTML code)
+  // Power available (Turboprop - n=1 as per MATLAB: else C=365*550*npr; n=1;)
+  // C = P_total * eta * 550 (matching MATLAB: C=365*550*npr)
   const P_total = Psh * Ne;
   const altitudeFactor = Math.pow(sigma, m);
   const effective_eff = eta + jetRatio;
   const P_avail_alt = P_total * effective_eff * altitudeFactor;
   const C = P_avail_alt * 550;
-  const n = 1.0;
+  const n = 1.0; // MATLAB: n=1 for turboprop
 
   // Sea level C
   const P_avail_sl = P_total * effective_eff;
   const C_sl = P_avail_sl * 550;
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, true);
+}
+
+// Overload for turbofan (isTurboprop = false)
+export function calculateTurbofanPerformanceWrapper(params: TurbofanParams): PerformanceResults {
+  return calculateTurbofanPerformance(params);
 }
 
 function performCalculations(
   W: number, S: number, Cd0: number, K: number, CLmax: number, h: number,
   rho: number, T: number, sigma: number, h_m: number,
-  C: number, n: number, C_sl: number, rho_sl: number
+  C: number, n: number, C_sl: number, rho_sl: number, isTurboprop: boolean = false
 ): PerformanceResults {
   // Stall speed
   const Vstall = Math.sqrt((2 * W) / (rho * S * CLmax));
@@ -362,5 +370,6 @@ function performCalculations(
     RC_max_sl, a_ceiling, b_ceiling, serviceCeiling, absoluteCeiling,
     chartData, glideData,
     stallInRCmax, stallInThetaMax,
+    isTurboprop,
   };
 }
