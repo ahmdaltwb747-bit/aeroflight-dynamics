@@ -33,6 +33,11 @@ export interface InputValues {
   Ne: number;
   m: number;
   jetRatio: number;  // Jet Power Ratio
+  // Range & Endurance
+  W0: number;    // Initial weight (lb)
+  Wf: number;    // Fuel weight (lb)
+  Ct: number;    // Thrust SFC (lb/lb.hr) - for jets
+  c: number;     // Power SFC (lb/hp.hr) - for propellers
 }
 
 const defaultValues: InputValues = {
@@ -50,6 +55,11 @@ const defaultValues: InputValues = {
   Ne: 2,
   m: 0.6,
   jetRatio: 0.05,
+  // Range & Endurance defaults
+  W0: 10000,
+  Wf: 2000,
+  Ct: 0.8,
+  c: 0.5,
 };
 
 export function AircraftAnalyzer() {
@@ -71,6 +81,10 @@ export function AircraftAnalyzer() {
         Tv0: inputs.Tv0,
         n: inputs.n,
         A: inputs.A,
+        m: inputs.m,
+        W0: inputs.W0,
+        Wf: inputs.Wf,
+        Ct: inputs.Ct,
       };
       return calculateTurbofanPerformance(params);
     } else {
@@ -86,6 +100,9 @@ export function AircraftAnalyzer() {
         Ne: inputs.Ne,
         m: inputs.m,
         jetRatio: inputs.jetRatio,
+        W0: inputs.W0,
+        Wf: inputs.Wf,
+        c: inputs.c,
       };
       return calculateTurbopropPerformance(params);
     }

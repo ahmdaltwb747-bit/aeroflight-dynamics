@@ -57,10 +57,10 @@ export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">V (ft/s)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">TA (lb)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">TR (lb)</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">PA (hp)</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">PR (hp)</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">PA (lb.ft/s)</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">PR (lb.ft/s)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">ET (lb)</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">EP (hp)</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">EP (lb.ft/s)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">θ (°)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">R/C (ft/s)</th>
                 <th className="px-3 py-2 text-left font-semibold text-muted-foreground">V_h (ft/s)</th>
@@ -75,15 +75,15 @@ export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
                   }`}
                 >
                   <td className="px-3 py-2 font-medium text-foreground">{row.V}</td>
-                  <td className="px-3 py-2 text-foreground">{row.TA.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.TR.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.PA.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.PR.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.ET.toFixed(1)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.EP.toFixed(1)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.Theta.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.RC.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.V_h.toFixed(4)}</td>
+                  <td className="px-3 py-2 text-foreground">{row.TA}</td>
+                  <td className="px-3 py-2 text-foreground">{row.TR}</td>
+                  <td className="px-3 py-2 text-foreground">{row.PA * 550}</td>
+                  <td className="px-3 py-2 text-foreground">{row.PR * 550}</td>
+                  <td className="px-3 py-2 text-foreground">{row.ET}</td>
+                  <td className="px-3 py-2 text-foreground">{row.EP * 550}</td>
+                  <td className="px-3 py-2 text-foreground">{row.Theta}</td>
+                  <td className="px-3 py-2 text-foreground">{row.RC}</td>
+                  <td className="px-3 py-2 text-foreground">{row.V_h}</td>
                 </tr>
               ))}
             </tbody>
@@ -118,11 +118,11 @@ export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
                   }`}
                 >
                   <td className="px-3 py-2 font-medium text-foreground">{row.V}</td>
-                  <td className="px-3 py-2 text-foreground">{row.ET_glide.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.Theta.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.V_v.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.V_h.toFixed(4)}</td>
-                  <td className="px-3 py-2 text-foreground">{row.RD.toFixed(4)}</td>
+                  <td className="px-3 py-2 text-foreground">{row.ET_glide}</td>
+                  <td className="px-3 py-2 text-foreground">{row.Theta}</td>
+                  <td className="px-3 py-2 text-foreground">{row.V_v}</td>
+                  <td className="px-3 py-2 text-foreground">{row.V_h}</td>
+                  <td className="px-3 py-2 text-foreground">{row.RD}</td>
                 </tr>
               ))}
             </tbody>

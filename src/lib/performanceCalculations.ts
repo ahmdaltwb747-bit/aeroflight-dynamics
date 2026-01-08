@@ -13,6 +13,11 @@ export interface TurbofanParams extends AircraftParams {
   Tv0: number;    // Static thrust per engine (lb)
   n: number;      // Velocity power index
   A: number;      // Atmospheric coefficient
+  m: number;      // Altitude power exponent
+  // Range & Endurance
+  W0?: number;    // Initial weight (lb)
+  Wf?: number;    // Fuel weight (lb)
+  Ct?: number;    // Thrust specific fuel consumption (lb/lb.hr)
 }
 
 export interface TurbopropParams extends AircraftParams {
@@ -21,6 +26,10 @@ export interface TurbopropParams extends AircraftParams {
   Ne: number;     // Number of engines
   m: number;      // Altitude power exponent
   jetRatio: number; // Jet Power Ratio
+  // Range & Endurance
+  W0?: number;    // Initial weight (lb)
+  Wf?: number;    // Fuel weight (lb)
+  c?: number;     // Power specific fuel consumption (lb/hp.hr)
 }
 
 export interface PerformanceResults {
@@ -40,14 +49,14 @@ export interface PerformanceResults {
 
   // Thrust/Power
   TRmin: number;
-  PRmin: number;
+  PRmin: number;  // lb.ft/s
   C: number;
 
   // Climb Performance
   RCmax: number;
   V_RCmax: number;
   Theta_RCmax: number;
-  MEP: number;
+  MEP: number;  // lb.ft/s
   
   // Max Climb Angle
   ThetaMax: number;
@@ -79,6 +88,12 @@ export interface PerformanceResults {
   b_ceiling: number;
   serviceCeiling: number;
   absoluteCeiling: number;
+
+  // Range & Endurance
+  R_max: number;        // Maximum Range (ft)
+  V_Rmax: number;       // Velocity for max range (ft/s)
+  E_max: number;        // Maximum Endurance (seconds)
+  V_Emax: number;       // Velocity for max endurance (ft/s)
 
   // Chart Data
   chartData: ChartDataPoint[];
@@ -145,7 +160,7 @@ function bisectionSolver(
 }
 
 export function calculateTurbofanPerformance(params: TurbofanParams): PerformanceResults {
-  const { W, S, Cd0, K, CLmax, h, Tv0, n, A } = params;
+  const { W, S, Cd0, K, CLmax, h, Tv0, n, A, m, W0, Wf, Ct } = params;
   
   // Atmosphere
   const atm = getAtmosphere(h);
@@ -155,17 +170,17 @@ export function calculateTurbofanPerformance(params: TurbofanParams): Performanc
   // Thrust constant (matches MATLAB)
   const T_sl_total = Tv0 * 2; // 2 engines
   const a_sound = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * T);
-  const C = T_sl_total * A * Math.pow(a_sound, n) * Math.pow(sigma, 0.6);
+  const C = T_sl_total * A * Math.pow(a_sound, n) * Math.pow(sigma, m);
 
   // Sea level C for ceiling calculation
   const a_sound_sl = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * PHYSICS.T_sl);
   const C_sl = T_sl_total * A * Math.pow(a_sound_sl, n);
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, false);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, false, W0, Wf, Ct, undefined);
 }
 
 export function calculateTurbopropPerformance(params: TurbopropParams): PerformanceResults {
-  const { W, S, Cd0, K, CLmax, h, Psh, eta, Ne, m, jetRatio } = params;
+  const { W, S, Cd0, K, CLmax, h, Psh, eta, Ne, m, jetRatio, W0, Wf, c } = params;
   
   // Atmosphere
   const atm = getAtmosphere(h);
@@ -185,7 +200,7 @@ export function calculateTurbopropPerformance(params: TurbopropParams): Performa
   const P_avail_sl = P_total * effective_eff;
   const C_sl = P_avail_sl * 550;
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, true);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, true, W0, Wf, undefined, c, eta);
 }
 
 // Overload for turbofan (isTurboprop = false)
@@ -196,7 +211,8 @@ export function calculateTurbofanPerformanceWrapper(params: TurbofanParams): Per
 function performCalculations(
   W: number, S: number, Cd0: number, K: number, CLmax: number, h: number,
   rho: number, T: number, sigma: number, h_m: number,
-  C: number, n: number, C_sl: number, rho_sl: number, isTurboprop: boolean = false
+  C: number, n: number, C_sl: number, rho_sl: number, isTurboprop: boolean = false,
+  W0?: number, Wf?: number, Ct?: number, c?: number, eta?: number
 ): PerformanceResults {
   // Stall speed
   const Vstall = Math.sqrt((2 * W) / (rho * S * CLmax));
@@ -207,7 +223,7 @@ function performCalculations(
 
   // Velocity for minimum power required
   const VPRmin = Math.pow((2 / rho) * (W / S) * Math.sqrt(K / (3 * Cd0)), 0.5);
-  const PRmin = calculateThrustRequired(VPRmin, rho, S, W, Cd0, K) * VPRmin / 550;
+  const PRmin = calculateThrustRequired(VPRmin, rho, S, W, Cd0, K) * VPRmin;  // lb.ft/s
 
   // Solve for Vmax and V2nd
   const Vmax = bisectionSolver(rho, S, W, Cd0, K, C, n, Vstall, true);
@@ -359,6 +375,41 @@ function performCalculations(
   // Absolute ceiling: RC = 0, hAbsolute = -a/b
   const absoluteCeiling = b_ceiling !== 0 ? -a_ceiling / b_ceiling : 0;
 
+  // Range & Endurance calculations based on PDF formulas
+  let R_max = 0;
+  let V_Rmax = 0;
+  let E_max = 0;
+  let V_Emax = 0;
+
+  if (W0 && Wf) {
+    const W1 = W0 - Wf;  // Final weight
+    const W_av = (W0 + W1) / 2;  // Average weight
+
+    if (isTurboprop && c && eta) {
+      // For Propellers (from PDF):
+      // R_max = (eta_pr / c) * (CL/CD)_max * ln(W0/W1)
+      // E_max = (eta_pr / c) * sqrt(2*rho*S) * (CL^1.5/CD)_max * (W1^-0.5 - W0^-0.5)
+      // Note: c is in lb/hp.hr, need to convert to consistent units
+      const c_per_sec = c / 3600;  // Convert to lb/hp.s
+      R_max = (eta / c_per_sec) * CLCD_max * Math.log(W0 / W1);
+      V_Rmax = Math.pow((2 / rho) * Math.sqrt(K / Cd0) * (W_av / S), 0.5);
+      
+      E_max = (eta / c_per_sec) * Math.sqrt(2 * rho * S) * CL_1p5_CD_max * (Math.pow(W1, -0.5) - Math.pow(W0, -0.5));
+      V_Emax = Math.pow((2 / rho) * Math.sqrt(K / (3 * Cd0)) * (W_av / S), 0.5);
+    } else if (Ct) {
+      // For Jets (from PDF):
+      // R_max = (2/Ct) * sqrt(2/(rho*S)) * (CL^0.5/CD)_max * (W0^0.5 - W1^0.5)
+      // E_max = (1/Ct) * (CL/CD)_max * ln(W0/W1)
+      // Note: Ct is in lb/lb.hr, need to convert to consistent units
+      const Ct_per_sec = Ct / 3600;  // Convert to lb/lb.s
+      R_max = (2 / Ct_per_sec) * Math.sqrt(2 / (rho * S)) * CL_0p5_CD_max * (Math.pow(W0, 0.5) - Math.pow(W1, 0.5));
+      V_Rmax = Math.pow((2 / rho) * Math.sqrt(3 * K / Cd0) * (W_av / S), 0.5);
+      
+      E_max = (1 / Ct_per_sec) * CLCD_max * Math.log(W0 / W1);
+      V_Emax = Math.pow((2 / rho) * Math.sqrt(K / Cd0) * (W_av / S), 0.5);
+    }
+  }
+
   return {
     rho, T, sigma, h_m,
     Vmax, V2nd, Vstall, Vmin, VPRmin, VTRmin,
@@ -368,6 +419,7 @@ function performCalculations(
     CLCD_max, V_CLCD_max, CL_1p5_CD_max, V_CL_1p5_CD_max, CL_0p5_CD_max, V_CL_0p5_CD_max,
     Theta_min_glide, V_Theta_min_glide, RD_Theta_min, RD_min, V_RD_min, Theta_RD_min, T_max_glide, R_max_glide,
     RC_max_sl, a_ceiling, b_ceiling, serviceCeiling, absoluteCeiling,
+    R_max, V_Rmax, E_max, V_Emax,
     chartData, glideData,
     stallInRCmax, stallInThetaMax,
     isTurboprop,
