@@ -24,43 +24,47 @@ const successColor = '#10b981';
 const accentColor = '#06b6d4';
 
 export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
+  // Velocity range based on engine mode
+  const vMin = mode === 'turboprop' ? 50 : 100;
+  const vMax = mode === 'turboprop' ? 600 : 1200;
+
   const thrustData = useMemo(() => {
     return results.chartData
-      .filter(d => d.V >= 50 && d.V <= 1200)
+      .filter(d => d.V >= vMin && d.V <= vMax)
       .map(d => ({
         V: d.V,
         TA: Math.max(0, d.TA),
         TR: d.TR,
       }));
-  }, [results.chartData]);
+  }, [results.chartData, vMin, vMax]);
 
   const powerData = useMemo(() => {
     return results.chartData
-      .filter(d => d.V >= 50 && d.V <= 1200)
+      .filter(d => d.V >= vMin && d.V <= vMax)
       .map(d => ({
         V: d.V,
-        PA: Math.max(0, d.PA),
-        PR: d.PR,
+        PA: Math.max(0, d.PA * 550),  // Convert to lb.ft/s
+        PR: d.PR * 550,  // Convert to lb.ft/s
       }));
-  }, [results.chartData]);
+  }, [results.chartData, vMin, vMax]);
 
   const climbData = useMemo(() => {
     return results.chartData
-      .filter(d => d.V >= results.Vstall && d.V <= results.Vmax)
+      .filter(d => d.V >= results.Vstall && d.V <= results.Vmax && d.V >= vMin && d.V <= vMax)
       .map(d => ({
         V_h: d.V_h,
         RC: Math.max(0, d.RC * 60), // Convert to ft/min
       }));
-  }, [results]);
+  }, [results, vMin, vMax]);
 
   const glideData = useMemo(() => {
     return results.glideData
-      .filter(d => d.V >= results.Vstall && d.V <= 1000)
+      .filter(d => d.V >= results.Vstall && d.V <= vMax)
       .map(d => ({
         V_h: d.V_h,
         V_v: d.V_v, // Negative for sink
       }));
-  }, [results]);
+  }, [results, vMax]);
 
   return (
     <div className="aviation-card">
@@ -116,7 +120,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
               <YAxis 
                 stroke="#888" 
                 fontSize={11}
-                label={{ value: 'Power (hp)', angle: -90, position: 'insideLeft', fill: '#888', fontSize: 10 }}
+                label={{ value: 'Power (lb.ft/s)', angle: -90, position: 'insideLeft', fill: '#888', fontSize: 10 }}
               />
               <Tooltip 
                 contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}

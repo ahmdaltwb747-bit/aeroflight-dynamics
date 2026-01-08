@@ -157,8 +157,15 @@ export function ResultsPanel({ results, mode }: ResultsPanelProps) {
           </div>
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-muted-foreground mb-3">Glide Range & Endurance</h4>
-            <ResultRow label="T_max (glide)" value={(results.T_max_glide / 60).toFixed(2)} unit="min" />
-            <ResultRow label="R_max (glide)" value={(results.R_max_glide / 5280).toFixed(2)} unit="miles" />
+            <ResultRow label="T_max (glide)" value={String(results.T_max_glide / 60)} unit="min" />
+            <ResultRow label="R_max (glide)" value={String(results.R_max_glide / 5280)} unit="miles" />
+          </div>
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-muted-foreground mb-3">Powered Range & Endurance</h4>
+            <ResultRow label="R_max" value={String(results.R_max)} unit="ft" />
+            <ResultRow label="V at R_max" value={String(results.V_Rmax)} unit="ft/s" />
+            <ResultRow label="E_max" value={String(results.E_max)} unit="sec" />
+            <ResultRow label="V at E_max" value={String(results.V_Emax)} unit="ft/s" />
           </div>
         </div>
       </div>

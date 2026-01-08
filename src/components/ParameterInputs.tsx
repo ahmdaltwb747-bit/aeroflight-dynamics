@@ -98,6 +98,23 @@ export function ParameterInputs({
           </div>}
       </div>
 
+      {/* Range & Endurance */}
+      <div className="border-t border-border pt-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Gauge className="w-4 h-4 text-success" />
+          <h3 className="text-sm font-bold text-success">Range & Endurance</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <InputField label="Initial Weight (W₀)" id="W0" value={inputs.W0} unit="lb" onChange={handleChange} />
+          <InputField label="Fuel Weight (Wf)" id="Wf" value={inputs.Wf} unit="lb" onChange={handleChange} />
+        </div>
+        {mode === 'turbofan' ? (
+          <InputField label="TSFC (Ct)" id="Ct" value={inputs.Ct} unit="lb/lb.hr" step="0.01" onChange={handleChange} />
+        ) : (
+          <InputField label="PSFC (c)" id="c" value={inputs.c} unit="lb/hp.hr" step="0.01" onChange={handleChange} />
+        )}
+      </div>
+
       {/* Altitude */}
       <div className="border-t border-border pt-5">
         <div className="flex items-center gap-2 mb-3">
