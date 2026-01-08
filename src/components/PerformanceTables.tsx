@@ -7,8 +7,11 @@ interface PerformanceTablesProps {
   mode: EngineMode;
 }
 
-// Sample velocities matching MATLAB: 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200
-const SAMPLE_VELOCITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+// Sample velocities matching MATLAB:
+// Turbofan: 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200
+// Turboprop: 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600
+const TURBOFAN_VELOCITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+const TURBOPROP_VELOCITIES = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
 
 function findClosestDataPoint<T extends { V: number }>(data: T[], targetV: number): T | null {
   let closest: T | null = null;
@@ -25,13 +28,16 @@ function findClosestDataPoint<T extends { V: number }>(data: T[], targetV: numbe
 }
 
 export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
+  // Select velocities based on engine mode
+  const sampleVelocities = mode === 'turboprop' ? TURBOPROP_VELOCITIES : TURBOFAN_VELOCITIES;
+  
   // Get sample data points at specific velocities
-  const thrustTableData = SAMPLE_VELOCITIES.map(v => {
+  const thrustTableData = sampleVelocities.map(v => {
     const point = findClosestDataPoint(results.chartData, v);
     return point;
   }).filter((p): p is ChartDataPoint => p !== null);
 
-  const glideTableData = SAMPLE_VELOCITIES.map(v => {
+  const glideTableData = sampleVelocities.map(v => {
     const point = findClosestDataPoint(results.glideData, v);
     return point;
   }).filter((p): p is GlideDataPoint => p !== null);
