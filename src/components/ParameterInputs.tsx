@@ -1,11 +1,14 @@
-import { Plane, Gauge, Mountain, Zap } from 'lucide-react';
+import { Plane, Gauge, Mountain, Zap, Loader2 } from 'lucide-react';
 import type { EngineMode, InputValues } from './AircraftAnalyzer';
+
 interface ParameterInputsProps {
   mode: EngineMode;
   inputs: InputValues;
   setInputs: React.Dispatch<React.SetStateAction<InputValues>>;
   onCalculate: () => void;
+  isCalculating?: boolean;
 }
+
 interface InputFieldProps {
   label: string;
   id: keyof InputValues;
@@ -14,6 +17,7 @@ interface InputFieldProps {
   step?: string;
   onChange: (id: keyof InputValues, value: number) => void;
 }
+
 function InputField({
   label,
   id,
@@ -22,21 +26,34 @@ function InputField({
   step = "1",
   onChange
 }: InputFieldProps) {
-  return <div>
+  return (
+    <div>
       <label htmlFor={id} className="data-label">{label}</label>
       <div className="relative">
-        <input type="number" id={id} value={value} step={step} onChange={e => onChange(id, parseFloat(e.target.value) || 0)} className="input-aviation px-px py-0 pr-0 ml-px mr-0 mb-0 mt-[2px]" />
-        {unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+        <input 
+          type="number" 
+          id={id} 
+          value={value} 
+          step={step} 
+          onChange={e => onChange(id, parseFloat(e.target.value) || 0)} 
+          className="input-aviation px-3 py-2" 
+        />
+        {unit && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
             {unit}
-          </span>}
+          </span>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }
+
 export function ParameterInputs({
   mode,
   inputs,
   setInputs,
-  onCalculate
+  onCalculate,
+  isCalculating = false
 }: ParameterInputsProps) {
   const handleChange = (id: keyof InputValues, value: number) => {
     setInputs(prev => ({
@@ -44,7 +61,21 @@ export function ParameterInputs({
       [id]: value
     }));
   };
-  return <div className="aviation-card space-y-6">
+
+  const getModeColor = () => {
+    if (mode === 'turboprop') return 'text-turboprop';
+    if (mode === 'piston') return 'text-warning';
+    return 'text-primary';
+  };
+
+  const getModeLabel = () => {
+    if (mode === 'turboprop') return 'Turboprop Configuration';
+    if (mode === 'piston') return 'Piston Engine Configuration';
+    return 'Turbofan Configuration';
+  };
+
+  return (
+    <div className="aviation-card space-y-6">
       <div className="flex items-center gap-2">
         <Plane className="w-5 h-5 text-primary" />
         <h2 className="section-title">Aircraft Parameters</h2>
@@ -67,13 +98,14 @@ export function ParameterInputs({
       {/* Engine Configuration */}
       <div className="border-t border-border pt-5">
         <div className="flex items-center gap-2 mb-4">
-          <Zap className={`w-4 h-4 ${mode === 'turbofan' ? 'text-primary' : 'text-turboprop'}`} />
-          <h3 className={`text-sm font-bold ${mode === 'turbofan' ? 'text-primary' : 'text-turboprop'}`}>
-            {mode === 'turbofan' ? 'Turbofan Configuration' : 'Turboprop Configuration'}
+          <Zap className={`w-4 h-4 ${getModeColor()}`} />
+          <h3 className={`text-sm font-bold ${getModeColor()}`}>
+            {getModeLabel()}
           </h3>
         </div>
 
-        {mode === 'turbofan' ? <div className="space-y-4">
+        {mode === 'turbofan' ? (
+          <div className="space-y-4">
             <div>
               <InputField label="Static Thrust (Tv0)" id="Tv0" value={inputs.Tv0} unit="lb" onChange={handleChange} />
               <p className="text-[10px] text-muted-foreground mt-1">
@@ -85,7 +117,9 @@ export function ParameterInputs({
               <InputField label="Atm. Coeff (A)" id="A" value={inputs.A} step="0.1" onChange={handleChange} />
               <InputField label="Alt. Power Exp (m)" id="m" value={inputs.m} step="0.1" onChange={handleChange} />
             </div>
-          </div> : <div className="space-y-4">
+          </div>
+        ) : mode === 'turboprop' ? (
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <InputField label="Shaft Power (Psh)" id="Psh" value={inputs.Psh} unit="hp" onChange={handleChange} />
               <InputField label="Num Engines" id="Ne" value={inputs.Ne} onChange={handleChange} />
@@ -95,7 +129,16 @@ export function ParameterInputs({
               <InputField label="Jet Power Ratio" id="jetRatio" value={inputs.jetRatio} step="0.01" onChange={handleChange} />
             </div>
             <InputField label="Alt. Power Exp (m)" id="m" value={inputs.m} step="0.1" onChange={handleChange} />
-          </div>}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <InputField label="Max Shaft Power (P₀)" id="P0" value={inputs.P0} unit="hp" onChange={handleChange} />
+            <InputField label="Prop Efficiency (η)" id="eta" value={inputs.eta} step="0.01" onChange={handleChange} />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              * Uses P/P₀ = 1.132(ρ/ρ₀) - 0.132
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Range & Endurance */}
@@ -125,11 +168,20 @@ export function ParameterInputs({
       </div>
 
       {/* Calculate Button */}
-      <button onClick={onCalculate} className={`btn-analyze ${mode === 'turboprop' ? 'btn-turboprop' : ''}`}>
+      <button 
+        onClick={onCalculate} 
+        disabled={isCalculating}
+        className={`btn-analyze ${mode === 'turboprop' ? 'btn-turboprop' : mode === 'piston' ? 'btn-piston' : ''} ${isCalculating ? 'animate-pulse' : ''}`}
+      >
         <div className="flex items-center justify-center gap-2">
-          <Gauge className="w-5 h-5" />
-          <span>Run Analysis</span>
+          {isCalculating ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Gauge className="w-5 h-5" />
+          )}
+          <span>{isCalculating ? 'Calculating...' : 'Run Analysis'}</span>
         </div>
       </button>
-    </div>;
+    </div>
+  );
 }
