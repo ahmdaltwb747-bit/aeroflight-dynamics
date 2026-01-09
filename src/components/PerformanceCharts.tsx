@@ -26,8 +26,11 @@ const accentColor = '#06b6d4';
 const fmt = (v: number) => v.toFixed(3);
 
 export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
-  const vMin = mode === 'turboprop' ? 50 : mode === 'piston' ? 100 : 100;
-  const vMax = mode === 'turboprop' ? 600 : mode === 'piston' ? 300 : 1200;
+  // Chart velocity ranges by engine type
+  // Turbofan: 0 to 1200, step 100 | Turboprop & Piston: 0 to 600, step 50
+  const vMin = 0;
+  const vMax = mode === 'turbofan' ? 1200 : 600;
+  const vStep = mode === 'turbofan' ? 100 : 50;
 
   const thrustData = useMemo(() => {
     return results.chartData
@@ -57,6 +60,15 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
     return results.ceilingData.map(d => ({ altitude: d.altitude / 1000, RC: d.RC }));
   }, [results.ceilingData]);
 
+  // Generate ticks based on engine type
+  const xTicks = useMemo(() => {
+    const ticks: number[] = [];
+    for (let v = 0; v <= vMax; v += vStep) {
+      ticks.push(v);
+    }
+    return ticks;
+  }, [vMax, vStep]);
+
   return (
     <div className="aviation-card">
       <h3 className="section-title mb-6">Performance Charts (at {results.h_m.toFixed(0)}m / {(results.h_m / 0.3048).toFixed(0)}ft)</h3>
@@ -68,7 +80,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={thrustData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} />
+              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
               <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} />
               <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
               <Legend wrapperStyle={{ fontSize: '10px' }} />
@@ -87,7 +99,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={powerData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} />
+              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
               <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} />
               <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
               <Legend wrapperStyle={{ fontSize: '10px' }} />
