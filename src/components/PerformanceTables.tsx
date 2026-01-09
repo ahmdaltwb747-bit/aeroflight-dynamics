@@ -8,9 +8,12 @@ interface PerformanceTablesProps {
 }
 
 // Sample velocities matching MATLAB:
+// Turbofan: 100 to 1200, step 100
 const TURBOFAN_VELOCITIES = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+// Turboprop: 50 to 600, step 50
 const TURBOPROP_VELOCITIES = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
-const PISTON_VELOCITIES = [100, 125, 150, 175, 200, 225, 250, 275, 300];
+// Piston: 50 to 600, step 50
+const PISTON_VELOCITIES = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
 
 function findClosestDataPoint<T extends { V: number }>(data: T[], targetV: number): T | null {
   let closest: T | null = null;
