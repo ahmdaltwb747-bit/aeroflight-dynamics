@@ -27,11 +27,11 @@ const fmt = (v: number) => v.toFixed(3);
 
 export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
   // Chart velocity ranges by engine type (matching MATLAB)
-  // Turbofan: 0 to 1200 (charts), step 50 for both tables and charts
+  // Turbofan: 0 to 1200 (charts), step 100
   // Turboprop & Piston: 0 to 600 (charts), step 50
   const vMin = 0;
   const vMax = mode === 'turbofan' ? 1200 : 600;
-  const vStep = 50; // All engines use step 50 to match MATLAB
+  const vStep = mode === 'turbofan' ? 100 : 50;
 
   const thrustData = useMemo(() => {
     return results.chartData
