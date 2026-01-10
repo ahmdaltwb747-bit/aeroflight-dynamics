@@ -197,12 +197,16 @@ export function calculateTurbofanPerformance(params: TurbofanParams): Performanc
   const atmSL = getSeaLevelAtmosphere();
   const { rho, T, sigma, h_m } = atm;
 
-  // Thrust constant (matches MATLAB)
-  const T_sl_total = Tv0 * 2; // 2 engines
+  // MATLAB: C = TTV * A * [(sqrt(1.4*1716*Th))^(n)] * [(rho/2.377*1000)^0.6]
+  // Note: rho/2.377*1000 = rho * 1000 / 2.377 = rho * ratiooooo where ratiooooo = 1000/2.377
+  // rho is in slug/ft³, rho_sl = 2.377e-3 = 2.377/1000, so rho * 1000 / 2.377 = rho / rho_sl = sigma
+  const T_sl_total = Tv0 * 2; // 2 engines (TTV = TV0 * 2)
   const a_sound = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * T);
+  // MATLAB formula: C = TTV * A * (a_sound)^n * (sigma)^0.6
+  // The 'm' parameter from input should be 0.6 for turbofan
   const C = T_sl_total * A * Math.pow(a_sound, n) * Math.pow(sigma, m);
 
-  // Sea level C for ceiling calculation
+  // Sea level C for ceiling calculation: C_sl = TTV * A * (a_sound_sl)^n (sigma=1 at SL)
   const a_sound_sl = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * PHYSICS.T_sl);
   const C_sl = T_sl_total * A * Math.pow(a_sound_sl, n);
 
@@ -217,17 +221,21 @@ export function calculateTurbopropPerformance(params: TurbopropParams): Performa
   const atmSL = getSeaLevelAtmosphere();
   const { rho, T, sigma, h_m } = atm;
 
-  // Power available (Turboprop - n=1 as per MATLAB: else C=365*550*npr; n=1;)
+  // MATLAB Turboprop: P_A = Power * eta (+ jet power ratio)
+  // PA/PA0 = (rho/rho0)^m for altitude scaling
   const P_total = Psh * Ne;
-  const altitudeFactor = Math.pow(sigma, m);
   const effective_eff = eta + jetRatio;
-  const P_avail_alt = P_total * effective_eff * altitudeFactor;
-  const C = P_avail_alt * 550;
-  const n = 1.0; // MATLAB: n=1 for turboprop
+  // At altitude: P_avail = P_sl * sigma^m
+  const altitudeFactor = Math.pow(sigma, m);
+  const PA_at_altitude = P_total * effective_eff * altitudeFactor;
+  
+  // MATLAB: C = PA * 550, n = 1 (TA = C / V)
+  const C = PA_at_altitude * 550;
+  const n = 1.0;
 
-  // Sea level C
-  const P_avail_sl = P_total * effective_eff;
-  const C_sl = P_avail_sl * 550;
+  // Sea level C: sigma = 1
+  const PA_at_sl = P_total * effective_eff;
+  const C_sl = PA_at_sl * 550;
 
   return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'turboprop', W0, Wf, undefined, c, eta);
 }
