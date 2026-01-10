@@ -26,11 +26,12 @@ const accentColor = '#06b6d4';
 const fmt = (v: number) => v.toFixed(3);
 
 export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
-  // Chart velocity ranges by engine type
-  // Turbofan: 0 to 1200, step 100 | Turboprop & Piston: 0 to 600, step 50
+  // Chart velocity ranges by engine type (matching MATLAB)
+  // Turbofan: 0 to 1200 (charts), step 50 for both tables and charts
+  // Turboprop & Piston: 0 to 600 (charts), step 50
   const vMin = 0;
   const vMax = mode === 'turbofan' ? 1200 : 600;
-  const vStep = mode === 'turbofan' ? 100 : 50;
+  const vStep = 50; // All engines use step 50 to match MATLAB
 
   const thrustData = useMemo(() => {
     return results.chartData

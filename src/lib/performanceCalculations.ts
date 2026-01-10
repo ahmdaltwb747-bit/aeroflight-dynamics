@@ -240,21 +240,16 @@ export function calculatePistonPerformance(params: PistonParams): PerformanceRes
   const atmSL = getSeaLevelAtmosphere();
   const { rho, T, sigma, h_m } = atm;
 
-  // Power available at altitude using piston engine formula from PDF:
-  // P/P0 = 1.132 * (rho/rho0) - 0.132
-  const P_ratio = 1.132 * sigma - 0.132;
-  const P_alt = P0 * P_ratio;
+  // MATLAB: Pb = Psls * sigma (Power decreases linearly with density ratio)
+  const P_alt = P0 * sigma;
   
-  // Thrust Available for piston: TA = eta * P * 550 / V
-  // So power constant = eta * P * 550
-  const powerConst = eta * P_alt * 550;
-  const powerConst_sl = eta * P0 * 550;
+  // MATLAB: PA_available = Pb * eta_prop, C = PA_available * 550
+  const PA_available = P_alt * eta;
+  const C = PA_available * 550;
+  const n = 1.0; // TA = C / V for piston
   
-  // For compatibility with existing logic, use C and n format where n=1
-  // TA = C * V^-1 = C / V, so C = eta * P * 550
-  const C = powerConst;
-  const n = 1.0;
-  const C_sl = powerConst_sl;
+  // Sea level: sigma = 1, so C_sl = P0 * eta * 550
+  const C_sl = P0 * eta * 550;
 
   return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'piston', W0, Wf, undefined, c, eta, P0);
 }
