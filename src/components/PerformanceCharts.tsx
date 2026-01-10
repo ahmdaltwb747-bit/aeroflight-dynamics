@@ -42,7 +42,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
   const powerData = useMemo(() => {
     return results.chartData
       .filter(d => d.V >= vMin && d.V <= vMax)
-      .map(d => ({ V: d.V, PA: Math.max(0, d.PA), PR: d.PR }));
+      .map(d => ({ V: d.V, PA: Math.max(0, d.PA / 550), PR: d.PR / 550 })); // Convert to hp
   }, [results.chartData, vMin, vMax]);
 
   const climbData = useMemo(() => {
@@ -96,7 +96,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
 
         {/* Power vs Velocity */}
         <div className="chart-container">
-          <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Power vs Velocity (lb.ft/s)</h4>
+          <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Power vs Velocity (hp)</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={powerData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />

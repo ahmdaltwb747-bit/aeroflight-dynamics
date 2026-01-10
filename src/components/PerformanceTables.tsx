@@ -63,10 +63,10 @@ export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">V (ft/s)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">TA (lb)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">TR (lb)</th>
-                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">PA (lb.ft/s)</th>
-                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">PR (lb.ft/s)</th>
+                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">PA (hp)</th>
+                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">PR (hp)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">ET (lb)</th>
-                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">EP (lb.ft/s)</th>
+                <th className="px-2 py-2 text-left font-semibold text-muted-foreground">EP (hp)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">θ (°)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">R/C (ft/s)</th>
                 <th className="px-2 py-2 text-left font-semibold text-muted-foreground">V_h (ft/s)</th>
@@ -83,10 +83,10 @@ export function PerformanceTables({ results, mode }: PerformanceTablesProps) {
                   <td className="px-2 py-2 font-medium text-foreground">{row.V}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.TA)}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.TR)}</td>
-                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.PA)}</td>
-                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.PR)}</td>
+                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.PA / 550)}</td>
+                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.PR / 550)}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.ET)}</td>
-                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.EP)}</td>
+                  <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.EP / 550)}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.Theta)}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.RC)}</td>
                   <td className="px-2 py-2 text-foreground font-mono text-xs">{fmt(row.V_h)}</td>

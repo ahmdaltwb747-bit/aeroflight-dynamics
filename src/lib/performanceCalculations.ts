@@ -221,23 +221,27 @@ export function calculateTurbopropPerformance(params: TurbopropParams): Performa
   const atmSL = getSeaLevelAtmosphere();
   const { rho, T, sigma, h_m } = atm;
 
-  // MATLAB Turboprop: P_A = Power * eta (+ jet power ratio)
-  // PA/PA0 = (rho/rho0)^m for altitude scaling
+  // MATLAB Turboprop: 
+  // P_total = Psh * Ne (total shaft power)
+  // effective_eff = eta + jetRatio (propeller efficiency + jet power ratio)
+  // PA_available = P_total * effective_eff (hp at sea level)
+  // At altitude: PA_alt = PA_sl * sigma^m
   const P_total = Psh * Ne;
   const effective_eff = eta + jetRatio;
-  // At altitude: P_avail = P_sl * sigma^m
+  const PA_sl_hp = P_total * effective_eff; // hp at sea level
+  
+  // At altitude
   const altitudeFactor = Math.pow(sigma, m);
-  const PA_at_altitude = P_total * effective_eff * altitudeFactor;
+  const PA_alt_hp = PA_sl_hp * altitudeFactor; // hp at altitude
   
   // MATLAB: C = PA * 550, n = 1 (TA = C / V)
-  const C = PA_at_altitude * 550;
+  const C = PA_alt_hp * 550;
   const n = 1.0;
 
-  // Sea level C: sigma = 1
-  const PA_at_sl = P_total * effective_eff;
-  const C_sl = PA_at_sl * 550;
+  // Sea level C
+  const C_sl = PA_sl_hp * 550;
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'turboprop', W0, Wf, undefined, c, eta);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'turboprop', W0, Wf, undefined, c, eta, undefined, PA_alt_hp, PA_sl_hp);
 }
 
 export function calculatePistonPerformance(params: PistonParams): PerformanceResults {
@@ -249,17 +253,20 @@ export function calculatePistonPerformance(params: PistonParams): PerformanceRes
   const { rho, T, sigma, h_m } = atm;
 
   // MATLAB: Pb = Psls * sigma (Power decreases linearly with density ratio)
-  const P_alt = P0 * sigma;
+  const P_alt_hp = P0 * sigma; // Brake power at altitude (hp)
   
-  // MATLAB: PA_available = Pb * eta_prop, C = PA_available * 550
-  const PA_available = P_alt * eta;
-  const C = PA_available * 550;
-  const n = 1.0; // TA = C / V for piston
+  // MATLAB: PA_available = Pb * eta_prop
+  const PA_alt_hp = P_alt_hp * eta; // Power available at altitude (hp)
+  const PA_sl_hp = P0 * eta; // Power available at sea level (hp)
   
-  // Sea level: sigma = 1, so C_sl = P0 * eta * 550
-  const C_sl = P0 * eta * 550;
+  // C = PA * 550 (for TA = C / V)
+  const C = PA_alt_hp * 550;
+  const n = 1.0;
+  
+  // Sea level
+  const C_sl = PA_sl_hp * 550;
 
-  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'piston', W0, Wf, undefined, c, eta, P0);
+  return performCalculations(W, S, Cd0, K, CLmax, h, rho, T, sigma, h_m, C, n, C_sl, atmSL.rho, 'piston', W0, Wf, undefined, c, eta, P0, PA_alt_hp, PA_sl_hp);
 }
 
 function performCalculations(
@@ -267,7 +274,8 @@ function performCalculations(
   rho: number, T: number, sigma: number, h_m: number,
   C: number, n: number, C_sl: number, rho_sl: number, 
   engineType: 'turbofan' | 'turboprop' | 'piston' = 'turbofan',
-  W0?: number, Wf?: number, Ct?: number, c?: number, eta?: number, P0?: number
+  W0?: number, Wf?: number, Ct?: number, c?: number, eta?: number, P0?: number,
+  PA_hp?: number, PA_hp_sl?: number // Power Available in hp (constant for turboprop/piston)
 ): PerformanceResults {
   // Stall speed
   const Vstall = Math.sqrt((2 * W) / (rho * S * CLmax));
@@ -309,7 +317,11 @@ function performCalculations(
     const CD = Cd0 + K * CL * CL;
     const TR = q * S * CD;
     const TA = C * Math.pow(V, -n);
-    const PA = TA * V;  // lb.ft/s
+    // For turboprop/piston: PA is CONSTANT (PA_hp * 550), TA = PA / V
+    // For turbofan: PA = TA * V
+    const PA = (engineType === 'turboprop' || engineType === 'piston') && PA_hp 
+      ? PA_hp * 550   // Constant power in lb.ft/s
+      : TA * V;       // For turbofan
     const PR = TR * V;  // lb.ft/s
     const ET = TA - TR;
     const EP = PA - PR;  // lb.ft/s
@@ -347,7 +359,10 @@ function performCalculations(
     const CD_sl = Cd0 + K * CL_sl * CL_sl;
     const TR_sl = q_sl * S * CD_sl;
     const TA_sl = C_sl * Math.pow(V, -n);
-    const PA_sl = TA_sl * V;
+    // For turboprop/piston: PA is CONSTANT at SL too
+    const PA_sl = (engineType === 'turboprop' || engineType === 'piston') && PA_hp_sl
+      ? PA_hp_sl * 550
+      : TA_sl * V;
     const PR_sl = TR_sl * V;
     const ET_sl = TA_sl - TR_sl;
     const EP_sl = PA_sl - PR_sl;
@@ -457,7 +472,10 @@ function performCalculations(
     const CD = Cd0 + K * CL * CL;
     const TR = q * S * CD;
     const TA = C_sl * Math.pow(V, -n);
-    const PA = TA * V;
+    // For turboprop/piston: PA is constant at SL
+    const PA = (engineType === 'turboprop' || engineType === 'piston') && PA_hp_sl
+      ? PA_hp_sl * 550
+      : TA * V;
     const PR = TR * V;
     const EP = PA - PR;
     const RC = EP / W;
