@@ -8,7 +8,64 @@
 
 @layer base {
   :root {
-    /* Deep navy aviation theme */
+    /* Light — calm slate & aviation blue */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - Aviation Blue */
+    --primary: 217 91% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Silver/Steel */
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 214 32% 94%;
+    --muted-foreground: 215 16% 42%;
+
+    /* Accent - Cyan thrust indicator */
+    --accent: 199 89% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 87%;
+    --input: 214 32% 90%;
+    --ring: 217 91% 55%;
+
+    --radius: 0.75rem;
+
+    /* Custom aviation colors */
+    --turbofan: 217 91% 55%;
+    --turboprop: 152 76% 30%;
+    --warning: 32 95% 38%;
+    --success: 152 76% 30%;
+    --info: 199 89% 38%;
+
+    /* Panels & surfaces */
+    --panel: 0 0% 100%;
+    --panel-alt: 214 40% 97%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217, 91%, 55%) 0%, hsl(199, 89%, 42%) 100%);
+    --gradient-turboprop: linear-gradient(135deg, hsl(152, 76%, 32%) 0%, hsl(172, 66%, 30%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(214, 40%, 98%) 100%);
+    --gradient-piston: linear-gradient(135deg, hsl(32, 95%, 40%) 0%, hsl(25, 95%, 42%) 100%);
+
+    /* Shadows */
+    --shadow-glow: 0 8px 24px -12px hsl(217, 91%, 55% / 0.45);
+    --shadow-card: 0 4px 16px -8px hsl(222, 47%, 30% / 0.18);
+  }
+
+  .dark {
+    /* Dark — deep navy aviation theme */
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
@@ -18,18 +75,15 @@
     --popover: 222 41% 15%;
     --popover-foreground: 210 40% 98%;
 
-    /* Primary - Aviation Blue */
     --primary: 217 91% 60%;
     --primary-foreground: 222 47% 11%;
 
-    /* Secondary - Silver/Steel */
     --secondary: 220 14% 25%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 220 14% 20%;
     --muted-foreground: 215 20% 65%;
 
-    /* Accent - Cyan thrust indicator */
     --accent: 185 100% 45%;
     --accent-foreground: 222 47% 11%;
 
@@ -40,22 +94,20 @@
     --input: 220 14% 20%;
     --ring: 217 91% 60%;
 
-    --radius: 0.75rem;
-
-    /* Custom aviation colors */
     --turbofan: 217 91% 60%;
     --turboprop: 152 76% 45%;
     --warning: 38 92% 50%;
     --success: 152 76% 45%;
     --info: 199 89% 48%;
 
-    /* Gradients */
+    --panel: 220 14% 16%;
+    --panel-alt: 220 14% 14%;
+
     --gradient-primary: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(199, 89%, 48%) 100%);
     --gradient-turboprop: linear-gradient(135deg, hsl(152, 76%, 45%) 0%, hsl(172, 66%, 40%) 100%);
-    --gradient-dark: linear-gradient(180deg, hsl(222, 47%, 11%) 0%, hsl(222, 41%, 8%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(222, 41%, 17%) 0%, hsl(222, 41%, 13%) 100%);
+    --gradient-piston: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(25, 95%, 53%) 100%);
 
-    /* Shadows */
     --shadow-glow: 0 0 40px -10px hsl(217, 91%, 60%);
     --shadow-card: 0 10px 40px -10px hsla(222, 47%, 5%, 0.5);
   }
@@ -69,8 +121,9 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', system-ui, sans-serif;
-    background: var(--gradient-dark);
+    background-color: hsl(var(--background));
     min-height: 100vh;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 }
 
@@ -83,11 +136,22 @@
 
   .metric-card {
     @apply rounded-lg p-4 border-l-4;
-    background: linear-gradient(145deg, hsl(220, 14%, 18%) 0%, hsl(220, 14%, 14%) 100%);
+    background: hsl(var(--panel-alt));
+  }
+
+  .result-section {
+    @apply rounded-lg p-4 border-l-4;
+    background: hsl(var(--panel-alt));
   }
 
   .input-aviation {
     @apply w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-base font-semibold;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .input-aviation-sm {
+    @apply w-full px-3 py-2 pr-12 rounded-lg border border-border bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-sm font-semibold;
     font-family: 'JetBrains Mono', monospace;
     letter-spacing: 0.5px;
   }
@@ -99,54 +163,63 @@
   }
 
   .btn-analyze:hover {
-    box-shadow: 0 0 60px -10px hsl(217, 91%, 60%);
+    box-shadow: 0 0 60px -10px hsl(217, 91%, 55%);
   }
 
   .btn-turboprop {
     background: var(--gradient-turboprop);
-    box-shadow: 0 0 40px -10px hsl(152, 76%, 45%);
+    box-shadow: 0 0 40px -10px hsl(152, 76%, 35%);
   }
 
   .btn-turboprop:hover {
-    box-shadow: 0 0 60px -10px hsl(152, 76%, 45%);
+    box-shadow: 0 0 60px -10px hsl(152, 76%, 35%);
   }
 
   .btn-piston {
-    background: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(25, 95%, 53%) 100%);
-    box-shadow: 0 0 40px -10px hsl(38, 92%, 50%);
+    background: var(--gradient-piston);
+    box-shadow: 0 0 40px -10px hsl(32, 95%, 40%);
   }
 
   .btn-piston:hover {
-    box-shadow: 0 0 60px -10px hsl(38, 92%, 50%);
+    box-shadow: 0 0 60px -10px hsl(32, 95%, 40%);
   }
 
   .mode-button-piston-active {
-    background: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(25, 95%, 53%) 100%);
-    box-shadow: 0 4px 20px -5px hsl(38, 92%, 50%);
+    background: var(--gradient-piston);
+    box-shadow: 0 4px 20px -5px hsl(32, 95%, 40%);
   }
 
   .chart-container {
     @apply rounded-lg p-4 border border-border;
-    background: linear-gradient(145deg, hsl(222, 41%, 14%) 0%, hsl(222, 41%, 10%) 100%);
+    background: hsl(var(--panel-alt));
+  }
+
+  .chart-tooltip {
+    @apply rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-lg;
+    color: hsl(var(--popover-foreground));
   }
 
   .mode-button {
-    @apply px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300;
+    @apply px-4 md:px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-300;
   }
 
   .mode-button-active {
     @apply text-primary-foreground;
     background: var(--gradient-primary);
-    box-shadow: 0 4px 20px -5px hsl(217, 91%, 60%);
+    box-shadow: 0 4px 20px -5px hsl(217, 91%, 55%);
   }
 
   .mode-button-turboprop-active {
     background: var(--gradient-turboprop);
-    box-shadow: 0 4px 20px -5px hsl(152, 76%, 45%);
+    box-shadow: 0 4px 20px -5px hsl(152, 76%, 35%);
   }
 
   .mode-button-inactive {
     @apply bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground;
+  }
+
+  .theme-toggle {
+    @apply w-10 h-10 rounded-lg border border-border bg-muted/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors;
   }
 
   .data-label {
@@ -166,7 +239,7 @@
   }
 
   .result-row {
-    @apply flex justify-between items-center py-2 border-b border-border/50 last:border-0;
+    @apply flex justify-between items-center py-2 border-b border-border/50 last:border-0 gap-3;
   }
 
   .result-label {
@@ -174,10 +247,14 @@
   }
 
   .result-value {
-    @apply text-sm font-semibold text-foreground font-mono;
+    @apply text-sm font-semibold text-foreground font-mono text-right;
   }
 
   .glow-text {
+    text-shadow: none;
+  }
+
+  .dark .glow-text {
     text-shadow: 0 0 20px hsl(217, 91%, 60%);
   }
 
@@ -208,15 +285,15 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(222, 41%, 10%);
+    background: hsl(var(--panel-alt));
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(220, 14%, 30%);
+    background: hsl(var(--secondary));
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(220, 14%, 40%);
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 }

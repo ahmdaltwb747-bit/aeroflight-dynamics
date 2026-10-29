@@ -5,6 +5,7 @@ import { MetricsCards } from './MetricsCards';
 import { PerformanceCharts } from './PerformanceCharts';
 import { ResultsPanel } from './ResultsPanel';
 import { PerformanceTables } from './PerformanceTables';
+import { ThemeToggle } from './ThemeToggle';
 import {
   calculateTurbofanPerformance,
   calculateTurbopropPerformance,
@@ -151,35 +152,38 @@ export function AircraftAnalyzer() {
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
       <div className="max-w-[1800px] mx-auto space-y-6">
         {/* Header */}
-        <header className="aviation-card">
+        <header className="aviation-card animate-fade-in">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-primary/30 shadow-lg">
-                <img src={logo} alt="Performance Analytics Logo" className="w-full h-full object-cover" />
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden ring-2 ring-primary/30 shadow-lg shrink-0">
+                <img src={logo} alt="Aircraft Performance Analyzer logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground glow-text">
                   Aircraft Performance Analyzer
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Advanced Aerodynamics & Flight Mechanics Tool
+                  Turbofan · Turboprop · Piston — aerodynamics &amp; flight mechanics made simple
                 </p>
               </div>
             </div>
-            <div className="text-left lg:text-right bg-muted/50 px-5 py-3 rounded-lg border border-border">
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                Designed & Developed By
-              </p>
-              <p className="text-sm font-bold text-primary mt-0.5">
-                AV ENG Ahmed Abdulrahman Ali Al-Sharshimi
-              </p>
+            <div className="flex items-center gap-3 self-end lg:self-auto">
+              <div className="text-left lg:text-right bg-muted/50 px-5 py-3 rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                  Designed &amp; Developed By
+                </p>
+                <p className="text-sm font-bold text-primary mt-0.5">
+                  Ahmed Abdulrahman Ali
+                </p>
+              </div>
+              <ThemeToggle />
             </div>
           </div>
         </header>
 
         {/* Mode Selector */}
         <div className="flex justify-center">
-          <div className="aviation-card p-1.5 inline-flex gap-1">
+          <div className="aviation-card p-1.5 inline-flex gap-1 flex-wrap justify-center max-w-full">
             <button
               onClick={() => handleModeChange('turbofan')}
               className={`mode-button ${
@@ -263,10 +267,11 @@ export function AircraftAnalyzer() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-sm text-muted-foreground pt-8 border-t border-border">
-          <p>© 2025 Aircraft Performance Analyzer. All algorithms based on Standard Atmosphere & Aerodynamic Theory.</p>
-          <p className="mt-1 font-semibold text-primary">
-            Developed by AV ENG Ahmed Abdulrahman Ali Al-Sharshimi
+        <footer className="text-center text-sm text-muted-foreground pt-8 border-t border-border space-y-1">
+          <p>© {new Date().getFullYear()} Aircraft Performance Analyzer · v1.0.0</p>
+          <p className="text-xs">For educational purposes only — verify all results before operational use.</p>
+          <p className="font-semibold text-primary">
+            Developed by Ahmed Abdulrahman Ali
           </p>
         </footer>
       </div>
