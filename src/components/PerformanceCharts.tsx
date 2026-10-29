@@ -5,7 +5,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
   ResponsiveContainer,
   ReferenceLine,
@@ -18,12 +17,54 @@ interface PerformanceChartsProps {
   mode: EngineMode;
 }
 
-const primaryColor = '#3b82f6';
-const secondaryColor = '#f59e0b';
-const successColor = '#10b981';
-const accentColor = '#06b6d4';
+// Mid-tone palette that reads well on both light and dark themes
+const C = {
+  blue: 'hsl(217, 91%, 55%)',
+  amber: 'hsl(38, 92%, 42%)',
+  green: 'hsl(152, 76%, 34%)',
+  cyan: 'hsl(199, 89%, 40%)',
+  red: 'hsl(0, 72%, 46%)',
+  emerald: 'hsl(142, 71%, 38%)',
+  rose: 'hsl(330, 80%, 45%)',
+  axis: 'hsl(215, 16%, 47%)',
+  grid: 'hsl(215, 20%, 55%)',
+};
 
 const fmt = (v: number) => v.toFixed(3);
+
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ name?: string; value?: number | string; color?: string }>;
+  label?: string | number;
+  unit?: string;
+  labelUnit?: string;
+}
+
+function ChartTooltip({ active, payload, label, unit, labelUnit }: ChartTooltipProps) {
+  if (!active || !payload || payload.length === 0) return null;
+  return (
+    <div className="chart-tooltip">
+      {label !== undefined && (
+        <p className="font-semibold mb-1 border-b border-border pb-1">
+          {typeof label === 'number' ? fmt(label) : label}
+          {labelUnit ? ` ${labelUnit}` : ''}
+        </p>
+      )}
+      {payload.map((entry, i) => (
+        <div key={i} className="flex items-center justify-between gap-3 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: entry.color }} />
+            {entry.name}
+          </span>
+          <span className="font-semibold">
+            {typeof entry.value === 'number' ? fmt(entry.value) : entry.value}
+            {unit ? ` ${unit}` : ''}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
   // Chart velocity ranges by engine type (matching MATLAB)
@@ -71,25 +112,25 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
   }, [vMax, vStep]);
 
   return (
-    <div className="aviation-card">
+    <div className="aviation-card animate-fade-in">
       <h3 className="section-title mb-6">Performance Charts (at {results.h_m.toFixed(0)}m / {(results.h_m / 0.3048).toFixed(0)}ft)</h3>
-      
+
       <div className="grid md:grid-cols-2 gap-6">
         {/* Thrust vs Velocity */}
         <div className="chart-container">
           <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Thrust vs Velocity</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={thrustData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
-              <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.35} />
+              <XAxis dataKey="V" stroke={C.axis} fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
+              <YAxis stroke={C.axis} fontSize={10} tickFormatter={fmt} />
+              <Tooltip content={<ChartTooltip unit="lb" labelUnit="ft/s" />} />
               <Legend wrapperStyle={{ fontSize: '10px' }} />
-              <ReferenceLine x={results.Vstall} stroke="#ef4444" strokeDasharray="5 5" label={{ value: `Vs=${fmt(results.Vstall)}`, fill: '#ef4444', fontSize: 9 }} />
-              <ReferenceLine x={results.Vmax} stroke="#22c55e" strokeDasharray="5 5" label={{ value: `Vmax=${fmt(results.Vmax)}`, fill: '#22c55e', fontSize: 9 }} />
-              <ReferenceLine x={results.VTRmin} stroke={accentColor} strokeDasharray="3 3" label={{ value: `VTRmin`, fill: accentColor, fontSize: 9 }} />
-              <Line type="monotone" dataKey="TA" stroke={primaryColor} name="TA" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="TR" stroke={secondaryColor} name="TR" dot={false} strokeWidth={2} />
+              <ReferenceLine x={results.Vstall} stroke={C.red} strokeDasharray="5 5" label={{ value: `Vs=${fmt(results.Vstall)}`, fill: C.red, fontSize: 9 }} />
+              <ReferenceLine x={results.Vmax} stroke={C.emerald} strokeDasharray="5 5" label={{ value: `Vmax=${fmt(results.Vmax)}`, fill: C.emerald, fontSize: 9 }} />
+              <ReferenceLine x={results.VTRmin} stroke={C.cyan} strokeDasharray="3 3" label={{ value: `VTRmin`, fill: C.cyan, fontSize: 9 }} />
+              <Line type="monotone" dataKey="TA" stroke={C.blue} name="TA" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="TR" stroke={C.amber} name="TR" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -99,14 +140,14 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Power vs Velocity (hp)</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={powerData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V" stroke="#888" fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
-              <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.35} />
+              <XAxis dataKey="V" stroke={C.axis} fontSize={10} tickFormatter={fmt} domain={[0, vMax]} ticks={xTicks} />
+              <YAxis stroke={C.axis} fontSize={10} tickFormatter={fmt} />
+              <Tooltip content={<ChartTooltip unit="hp" labelUnit="ft/s" />} />
               <Legend wrapperStyle={{ fontSize: '10px' }} />
-              <ReferenceLine x={results.VPRmin} stroke={accentColor} strokeDasharray="5 5" label={{ value: `VPRmin=${fmt(results.VPRmin)}`, fill: accentColor, fontSize: 9 }} />
-              <Line type="monotone" dataKey="PA" stroke={primaryColor} name="PA" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="PR" stroke={secondaryColor} name="PR" dot={false} strokeWidth={2} />
+              <ReferenceLine x={results.VPRmin} stroke={C.cyan} strokeDasharray="5 5" label={{ value: `VPRmin=${fmt(results.VPRmin)}`, fill: C.cyan, fontSize: 9 }} />
+              <Line type="monotone" dataKey="PA" stroke={C.blue} name="PA" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="PR" stroke={C.amber} name="PR" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -116,11 +157,11 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Rate of Climb (ft/min)</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={climbData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V_h" stroke="#888" fontSize={10} tickFormatter={fmt} />
-              <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
-              <Line type="monotone" dataKey="RC" stroke={successColor} name="R/C" dot={false} strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.35} />
+              <XAxis dataKey="V_h" stroke={C.axis} fontSize={10} tickFormatter={fmt} />
+              <YAxis stroke={C.axis} fontSize={10} tickFormatter={fmt} />
+              <Tooltip content={<ChartTooltip unit="ft/min" labelUnit="ft/s" />} />
+              <Line type="monotone" dataKey="RC" stroke={C.green} name="R/C" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -130,13 +171,13 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Rate of Climb vs Altitude</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={ceilingData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="RC" stroke="#888" fontSize={10} tickFormatter={fmt} label={{ value: 'R/C (ft/s)', position: 'insideBottom', offset: -5, fill: '#888', fontSize: 9 }} />
-              <YAxis stroke="#888" fontSize={10} tickFormatter={fmt} label={{ value: 'Alt (kft)', angle: -90, position: 'insideLeft', fill: '#888', fontSize: 9 }} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
-              <ReferenceLine y={results.serviceCeiling / 1000} stroke="#3b82f6" strokeDasharray="5 5" label={{ value: `Service: ${(results.serviceCeiling/1000).toFixed(1)}kft`, fill: '#3b82f6', fontSize: 9 }} />
-              <ReferenceLine y={results.absoluteCeiling / 1000} stroke="#ef4444" strokeDasharray="5 5" label={{ value: `Absolute: ${(results.absoluteCeiling/1000).toFixed(1)}kft`, fill: '#ef4444', fontSize: 9 }} />
-              <Line type="monotone" dataKey="altitude" stroke="#ec4899" name="Altitude" dot={false} strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.35} />
+              <XAxis dataKey="RC" stroke={C.axis} fontSize={10} tickFormatter={fmt} label={{ value: 'R/C (ft/s)', position: 'insideBottom', offset: -5, fill: C.axis, fontSize: 9 }} />
+              <YAxis stroke={C.axis} fontSize={10} tickFormatter={fmt} label={{ value: 'Alt (kft)', angle: -90, position: 'insideLeft', fill: C.axis, fontSize: 9 }} />
+              <Tooltip content={<ChartTooltip unit="kft" labelUnit="ft/s" />} />
+              <ReferenceLine y={results.serviceCeiling / 1000} stroke={C.blue} strokeDasharray="5 5" label={{ value: `Service: ${(results.serviceCeiling/1000).toFixed(1)}kft`, fill: C.blue, fontSize: 9 }} />
+              <ReferenceLine y={results.absoluteCeiling / 1000} stroke={C.red} strokeDasharray="5 5" label={{ value: `Absolute: ${(results.absoluteCeiling/1000).toFixed(1)}kft`, fill: C.red, fontSize: 9 }} />
+              <Line type="monotone" dataKey="altitude" stroke={C.rose} name="Altitude" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -146,11 +187,11 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
           <h4 className="text-sm font-semibold text-center text-muted-foreground mb-3">Gliding Hodograph (Sink Rate)</h4>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={glideData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="V_h" stroke="#888" fontSize={10} type="number" domain={['dataMin', 'dataMax']} tickFormatter={fmt} />
-              <YAxis stroke="#888" fontSize={10} domain={['dataMin', 0]} tickFormatter={fmt} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }} />
-              <Line type="monotone" dataKey="V_v" stroke="#f43f5e" name="V_v (Sink)" dot={false} strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.35} />
+              <XAxis dataKey="V_h" stroke={C.axis} fontSize={10} type="number" domain={['dataMin', 'dataMax']} tickFormatter={fmt} />
+              <YAxis stroke={C.axis} fontSize={10} domain={['dataMin', 0]} tickFormatter={fmt} />
+              <Tooltip content={<ChartTooltip unit="ft/s" labelUnit="ft/s" />} />
+              <Line type="monotone" dataKey="V_v" stroke={C.red} name="V_v (Sink)" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -34,12 +34,9 @@ interface ResultSectionProps {
 
 function ResultSection({ icon, title, color, children }: ResultSectionProps) {
   return (
-    <div 
-      className="p-4 rounded-lg border-l-4"
-      style={{ 
-        background: 'linear-gradient(145deg, hsl(220, 14%, 18%) 0%, hsl(220, 14%, 14%) 100%)',
-        borderLeftColor: color 
-      }}
+    <div
+      className="result-section"
+      style={{ borderLeftColor: color }}
     >
       <div className="flex items-center gap-2 mb-3">
         {icon}
