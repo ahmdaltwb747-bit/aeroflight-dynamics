@@ -1,4 +1,4 @@
-import type { InputValues } from './AircraftAnalyzer';
+import type { InputValues } from '@/components/AircraftAnalyzer';
 
 export interface AircraftPreset {
   id: string;
