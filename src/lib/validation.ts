@@ -1,4 +1,4 @@
-import type { EngineMode, InputValues } from './AircraftAnalyzer';
+import type { EngineMode, InputValues } from '@/components/AircraftAnalyzer';
 
 export interface ValidationError {
   field: keyof InputValues | 'cross';
