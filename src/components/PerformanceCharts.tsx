@@ -182,16 +182,16 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
             Thrust Required vs Available
           </h4>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={thrustData} margin={{ top: 5, right: 20, left: 10, bottom: 18 }}>
+            <LineChart data={thrustData} margin={{ top: 5, right: 20, left: 10, bottom: 32 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.5} />
               <XAxis
                 dataKey="V"
                 stroke={C.axis}
                 fontSize={10}
-                tickFormatter={fmt}
+                tickFormatter={(v: number) => v.toFixed(0)}
                 domain={[0, vMax]}
                 ticks={xTicks}
-                label={{ ...axisLabelStyle(C.axis), value: 'Velocity (ft/s)', position: 'insideBottom', offset: -8 }}
+                label={{ ...axisLabelStyle(C.axis), value: 'Velocity (ft/s)', position: 'bottom', offset: 6 }}
               />
               <YAxis
                 stroke={C.axis}
@@ -218,16 +218,16 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
             Power Required vs Available
           </h4>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={powerData} margin={{ top: 5, right: 20, left: 10, bottom: 18 }}>
+            <LineChart data={powerData} margin={{ top: 5, right: 20, left: 10, bottom: 32 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.5} />
               <XAxis
                 dataKey="V"
                 stroke={C.axis}
                 fontSize={10}
-                tickFormatter={fmt}
+                tickFormatter={(v: number) => v.toFixed(0)}
                 domain={[0, vMax]}
                 ticks={xTicks}
-                label={{ ...axisLabelStyle(C.axis), value: 'Velocity (ft/s)', position: 'insideBottom', offset: -8 }}
+                label={{ ...axisLabelStyle(C.axis), value: 'Velocity (ft/s)', position: 'bottom', offset: 6 }}
               />
               <YAxis
                 stroke={C.axis}
@@ -252,14 +252,14 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
             Rate of Climb vs Velocity
           </h4>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={climbData} margin={{ top: 5, right: 20, left: 10, bottom: 18 }}>
+            <LineChart data={climbData} margin={{ top: 5, right: 20, left: 10, bottom: 32 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.5} />
               <XAxis
                 dataKey="V_h"
                 stroke={C.axis}
                 fontSize={10}
-                tickFormatter={fmt}
-                label={{ ...axisLabelStyle(C.axis), value: 'Horizontal Velocity (ft/s)', position: 'insideBottom', offset: -8 }}
+                tickFormatter={(v: number) => v.toFixed(0)}
+                label={{ ...axisLabelStyle(C.axis), value: 'Horizontal Velocity (ft/s)', position: 'bottom', offset: 6 }}
               />
               <YAxis
                 stroke={C.axis}
@@ -281,14 +281,14 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
             Rate of Climb vs Altitude (Ceiling)
           </h4>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={ceilingData} margin={{ top: 5, right: 20, left: 10, bottom: 18 }}>
+            <LineChart data={ceilingData} margin={{ top: 5, right: 20, left: 10, bottom: 32 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.5} />
               <XAxis
                 dataKey="altitude"
                 stroke={C.axis}
                 fontSize={10}
-                tickFormatter={fmt}
-                label={{ ...axisLabelStyle(C.axis), value: 'Altitude (kft)', position: 'insideBottom', offset: -8 }}
+                tickFormatter={(v: number) => v.toFixed(0)}
+                label={{ ...axisLabelStyle(C.axis), value: 'Altitude (kft)', position: 'bottom', offset: 6 }}
               />
               <YAxis
                 stroke={C.axis}
@@ -311,7 +311,7 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
             Gliding Hodograph (Sink Rate)
           </h4>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={glideData} margin={{ top: 5, right: 20, left: 10, bottom: 18 }}>
+            <LineChart data={glideData} margin={{ top: 5, right: 20, left: 10, bottom: 32 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} strokeOpacity={0.5} />
               <XAxis
                 dataKey="V_h"
@@ -319,8 +319,8 @@ export function PerformanceCharts({ results, mode }: PerformanceChartsProps) {
                 fontSize={10}
                 type="number"
                 domain={['dataMin', 'dataMax']}
-                tickFormatter={fmt}
-                label={{ ...axisLabelStyle(C.axis), value: 'Horizontal Velocity (ft/s)', position: 'insideBottom', offset: -8 }}
+                tickFormatter={(v: number) => v.toFixed(0)}
+                label={{ ...axisLabelStyle(C.axis), value: 'Horizontal Velocity (ft/s)', position: 'bottom', offset: 6 }}
               />
               <YAxis
                 stroke={C.axis}
