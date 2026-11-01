@@ -173,7 +173,7 @@ export function buildCsv(ctx: ExportContext): string {
 
 export function buildPdf(ctx: ExportContext): jsPDF {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'pt' });
-  const dark = [30, 58, 95];
+  const dark: [number, number, number] = [30, 58, 95];
 
   doc.setFontSize(16);
   doc.text('Aircraft Performance Analyzer — Report', 40, 40);
