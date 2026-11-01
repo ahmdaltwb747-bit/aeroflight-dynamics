@@ -97,6 +97,10 @@ export const climbRate = (ftPerSec: number, sys: UnitSystem): number =>
 export const climbRateUnit = (sys: UnitSystem): string =>
   sys === 'imperial' ? 'ft/min' : 'm/s';
 
+/** Clean float noise for displaying converted input values. */
+export const cleanInput = (v: number): number =>
+  isFinite(v) ? Number(v.toPrecision(8)) : 0;
+
 /** Format helper — 3 decimals, thousands-friendly for large numbers. */
 export const fmt3 = (v: number): string => {
   if (!isFinite(v)) return '—';

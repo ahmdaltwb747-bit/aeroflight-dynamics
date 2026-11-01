@@ -297,3 +297,9 @@
     background: hsl(var(--muted-foreground) / 0.5);
   }
 }
+
+/* Validation error state for inputs */
+.input-error {
+  border-color: hsl(0 84% 60%) !important;
+  box-shadow: 0 0 0 1px hsl(0 84% 60% / 0.35) !important;
+}
