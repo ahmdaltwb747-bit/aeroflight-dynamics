@@ -303,3 +303,13 @@
   border-color: hsl(0 84% 60%) !important;
   box-shadow: 0 0 0 1px hsl(0 84% 60% / 0.35) !important;
 }
+
+/* Preset aircraft selector */
+.select-aviation {
+  @apply w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 cursor-pointer;
+}
+
+/* Secondary reset button */
+.btn-reset {
+  @apply w-full py-3 px-6 rounded-xl border border-border bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted font-semibold text-base transition-all duration-200;
+}

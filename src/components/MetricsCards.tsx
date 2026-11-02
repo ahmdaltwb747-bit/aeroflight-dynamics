@@ -1,10 +1,12 @@
 import { Gauge, Wind, TrendingUp, Compass } from 'lucide-react';
+import { toDisplay, climbRate, climbRateUnit, type UnitSystem } from '@/lib/units';
 import type { PerformanceResults } from '@/lib/performanceCalculations';
 import type { EngineMode } from './AircraftAnalyzer';
 
 interface MetricsCardsProps {
   results: PerformanceResults;
   mode: EngineMode;
+  sys: UnitSystem;
 }
 
 interface MetricCardProps {
@@ -18,9 +20,9 @@ interface MetricCardProps {
 
 function MetricCard({ icon, title, value, unit, color, delay }: MetricCardProps) {
   return (
-    <div 
+    <div
       className="metric-card animate-fade-in"
-      style={{ 
+      style={{
         borderLeftColor: color,
         animationDelay: `${delay * 0.1}s`
       }}
@@ -39,29 +41,34 @@ function MetricCard({ icon, title, value, unit, color, delay }: MetricCardProps)
   );
 }
 
-export function MetricsCards({ results, mode }: MetricsCardsProps) {
-  const primaryColor = mode === 'turbofan' ? 'hsl(217, 91%, 60%)' : 'hsl(152, 76%, 45%)';
-  
+export function MetricsCards({ results, sys }: MetricsCardsProps) {
+  const primaryColor = 'hsl(217, 91%, 60%)';
+
+  // Speeds: knots (imperial) or m/s (metric)
+  const speed = (fts: number) =>
+    sys === 'imperial' ? (fts * 0.592484).toFixed(0) : toDisplay(fts, 'speed', sys).toFixed(1);
+  const speedUnit = sys === 'imperial' ? 'knots' : 'm/s';
+
   const metrics = [
     {
       icon: <Gauge className="w-4 h-4 text-primary" />,
       title: "Max Speed (Vmax)",
-      value: (results.Vmax * 0.592484).toFixed(0),
-      unit: "knots",
+      value: speed(results.Vmax),
+      unit: speedUnit,
       color: primaryColor,
     },
     {
       icon: <Wind className="w-4 h-4 text-warning" />,
       title: "Stall Speed (Vs)",
-      value: (results.Vstall * 0.592484).toFixed(0),
-      unit: "knots",
+      value: speed(results.Vstall),
+      unit: speedUnit,
       color: "hsl(38, 92%, 50%)",
     },
     {
       icon: <TrendingUp className="w-4 h-4 text-success" />,
       title: "Max Rate of Climb",
-      value: (results.RCmax * 60).toFixed(0),
-      unit: "ft/min",
+      value: climbRate(results.RCmax, sys).toFixed(0),
+      unit: climbRateUnit(sys),
       color: "hsl(152, 76%, 45%)",
     },
     {

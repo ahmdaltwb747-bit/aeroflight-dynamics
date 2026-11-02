@@ -97,6 +97,12 @@ export const climbRate = (ftPerSec: number, sys: UnitSystem): number =>
 export const climbRateUnit = (sys: UnitSystem): string =>
   sys === 'imperial' ? 'ft/min' : 'm/s';
 
+/** Excess/available power from internal lb·ft/s: hp (imperial) or kW (metric). */
+export const powerDisp = (lbFtS: number, sys: UnitSystem): number =>
+  sys === 'imperial' ? lbFtS / 550 : (lbFtS * 1.35581795) / 1000;
+export const powerDispUnit = (sys: UnitSystem): string =>
+  sys === 'imperial' ? 'hp' : 'kW';
+
 /** Clean float noise for displaying converted input values. */
 export const cleanInput = (v: number): number =>
   isFinite(v) ? Number(v.toPrecision(8)) : 0;
