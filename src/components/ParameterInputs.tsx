@@ -83,7 +83,7 @@ function InputField({
           value={display}
           step={step}
           onChange={e => handleChange(e.target.value)}
-          className={`input-aviation-sm ${error ? 'input-error' : ''}`}
+          className={`input-aviation-sm ${unit ? 'pr-12' : 'pr-3'} ${error ? 'input-error' : ''}`}
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
@@ -186,7 +186,7 @@ export function ParameterInputs({
 
       {/* Aircraft Data Section */}
       <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           <InputField label="Weight (W)" id="W" value={inputs.W} cat="weight" tip={tips.W} sys={sys} error={errorFor('W')} onChange={handleChange} />
           <InputField label="Wing Area (S)" id="S" value={inputs.S} cat="area" tip={tips.S} sys={sys} error={errorFor('S')} onChange={handleChange} />
         </div>
@@ -238,7 +238,7 @@ export function ParameterInputs({
             <InputField label="Max Shaft Power (P₀)" id="P0" value={inputs.P0} cat="power" tip={tips.P0} sys={sys} error={errorFor('P0')} onChange={handleChange} />
             <InputField label="Prop Efficiency (η)" id="eta" value={inputs.eta} step="0.01" tip={tips.eta} sys={sys} error={errorFor('eta')} onChange={handleChange} />
             <p className="text-[10px] text-muted-foreground mt-1">
-              * Uses P/P₀ = 1.132(ρ/ρ₀) − 0.132
+              * Power decays with altitude as P = P₀ · σ
             </p>
           </div>
         )}
