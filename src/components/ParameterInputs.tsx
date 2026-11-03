@@ -83,7 +83,7 @@ function InputField({
           value={display}
           step={step}
           onChange={e => handleChange(e.target.value)}
-          className={`input-aviation-sm ${error ? 'input-error' : ''}`}
+          className={`input-aviation-sm ${unit ? 'pr-12' : 'pr-3'} ${error ? 'input-error' : ''}`}
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
@@ -186,7 +186,7 @@ export function ParameterInputs({
 
       {/* Aircraft Data Section */}
       <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           <InputField label="Weight (W)" id="W" value={inputs.W} cat="weight" tip={tips.W} sys={sys} error={errorFor('W')} onChange={handleChange} />
           <InputField label="Wing Area (S)" id="S" value={inputs.S} cat="area" tip={tips.S} sys={sys} error={errorFor('S')} onChange={handleChange} />
         </div>
