@@ -1,10 +1,15 @@
 # Roadmap — Engineering-credibility upgrade
 
-No core formula changes. Each item below waits on the user's formula verification except where noted.
+All items complete and verified in the browser (Nov 4, 2026):
 
-1. [pending user verification] Formula audit — list all existing formulas (done, presented in chat); wait for confirmation before editing anything.
-2. SI / Imperial unit toggle — converts all inputs and outputs everywhere (inputs, metric cards, charts, tables, results panel).
-3. Input validation — friendly, physically-meaningful error messages (no negatives, ranges per parameter).
-4. Presets dropdown — a few real aircraft (regional jet, turboprop, piston) auto-filling typical parameters. Aircraft choice pending user answer.
-5. Reset button + Export results (format pending user answer: PDF / CSV / both).
-6. Methodology page — equations, assumptions (ISA atmosphere, parabolic drag polar), references; new route + navigation.
+1. [done] Formula audit — presented and confirmed.
+2. [done] SI / Imperial toggle — inputs, metric cards, charts, tables, results panel.
+3. [done] Input validation with friendly, physically-meaningful errors.
+4. [done] Presets dropdown — A350-1000 (turbofan), ATR 72-600 (turboprop), Cessna 172 (piston).
+5. [done] Reset button + CSV/PDF export.
+6. [done] Methodology page (/methodology) — equations, ISA assumptions, references.
+
+Polish fixes verified this session:
+- Ceiling display: Imperial shows kft (was raw ft labelled kft), SI shows km.
+- Result formatting: T_max glide, R_max, E_max now 3-decimal / locale-formatted.
+- Favicon/icon: converted to real multi-size .ico + PNGs, linked in index.html.

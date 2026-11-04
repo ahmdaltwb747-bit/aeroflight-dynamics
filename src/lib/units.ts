@@ -47,7 +47,8 @@ export const unitOf = (cat: UnitCategory, sys: UnitSystem): string => {
 
 /** Internal (Imperial) value -> value shown to the user. */
 export const toDisplay = (v: number, cat: UnitCategory, sys: UnitSystem): number => {
-  if (cat === 'none' || sys === 'imperial') return v;
+  if (cat === 'none') return v;
+  if (sys === 'imperial' && cat !== 'ceiling') return v;
   switch (cat) {
     case 'weight': return v / LB_PER_KG;
     case 'area': return v / (FT_PER_M * FT_PER_M);
@@ -59,7 +60,7 @@ export const toDisplay = (v: number, cat: UnitCategory, sys: UnitSystem): number
     case 'tsfc': return v * TSFC_MGNS_PER_UNIT;
     case 'psfc': return v * PSFC_GKWS_PER_UNIT;
     case 'range': return v * 0.3048 / 1000;
-    case 'ceiling': return v * 0.3048 / 1000;
+    case 'ceiling': return sys === 'imperial' ? v / 1000 : v * 0.3048 / 1000;
     case 'density': return v / SLUGFT3_PER_KGM3;
     case 'temperature': return v * 5 / 9;
   }
