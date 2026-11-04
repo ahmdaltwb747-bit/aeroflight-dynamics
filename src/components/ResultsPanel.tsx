@@ -1,5 +1,5 @@
 import { Rocket, Wind, Thermometer, Gauge, Mountain, ArrowDown, TrendingUp } from 'lucide-react';
-import { toDisplay, unitOf, powerDisp, powerDispUnit, climbRate, climbRateUnit, glideRange, glideRangeUnit, type UnitSystem } from '@/lib/units';
+import { toDisplay, unitOf, powerDisp, powerDispUnit, climbRate, climbRateUnit, glideRange, glideRangeUnit, fmt3, type UnitSystem } from '@/lib/units';
 import type { PerformanceResults } from '@/lib/performanceCalculations';
 import type { EngineMode } from './AircraftAnalyzer';
 
