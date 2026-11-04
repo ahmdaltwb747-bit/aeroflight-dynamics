@@ -47,7 +47,8 @@ export const unitOf = (cat: UnitCategory, sys: UnitSystem): string => {
 
 /** Internal (Imperial) value -> value shown to the user. */
 export const toDisplay = (v: number, cat: UnitCategory, sys: UnitSystem): number => {
-  if (cat === 'none' || sys === 'imperial') return v;
+  if (cat === 'none') return v;
+  if (sys === 'imperial' && cat !== 'ceiling') return v;
   switch (cat) {
     case 'weight': return v / LB_PER_KG;
     case 'area': return v / (FT_PER_M * FT_PER_M);
