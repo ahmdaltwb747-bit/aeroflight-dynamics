@@ -59,7 +59,7 @@ export const toDisplay = (v: number, cat: UnitCategory, sys: UnitSystem): number
     case 'tsfc': return v * TSFC_MGNS_PER_UNIT;
     case 'psfc': return v * PSFC_GKWS_PER_UNIT;
     case 'range': return v * 0.3048 / 1000;
-    case 'ceiling': return v * 0.3048 / 1000;
+    case 'ceiling': return sys === 'imperial' ? v / 1000 : v * 0.3048 / 1000;
     case 'density': return v / SLUGFT3_PER_KGM3;
     case 'temperature': return v * 5 / 9;
   }

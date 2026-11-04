@@ -168,14 +168,14 @@ export function ResultsPanel({ results, mode: _mode, sys }: ResultsPanelProps) {
           </div>
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-muted-foreground mb-3">Glide Range &amp; Endurance</h4>
-            <ResultRow label="T_max (glide)" value={String(results.T_max_glide / 60)} unit="min" />
+            <ResultRow label="T_max (glide)" value={(results.T_max_glide / 60).toFixed(3)} unit="min" />
             <ResultRow label="R_max (glide)" value={glideRange(results.R_max_glide, sys).toFixed(3)} unit={glideRangeUnit(sys)} />
           </div>
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-muted-foreground mb-3">Powered Range &amp; Endurance</h4>
-            <ResultRow label="R_max" value={toDisplay(results.R_max, 'range', sys).toFixed(3)} unit={uRng} />
+            <ResultRow label="R_max" value={fmt3(toDisplay(results.R_max, 'range', sys))} unit={uRng} />
             <ResultRow label="V at R_max" value={toDisplay(results.V_Rmax, 'speed', sys).toFixed(2)} unit={uSpd} />
-            <ResultRow label="E_max" value={String(results.E_max)} unit="sec" />
+            <ResultRow label="E_max" value={results.E_max.toFixed(3)} unit="sec" />
             <ResultRow label="V at E_max" value={toDisplay(results.V_Emax, 'speed', sys).toFixed(2)} unit={uSpd} />
           </div>
         </div>
