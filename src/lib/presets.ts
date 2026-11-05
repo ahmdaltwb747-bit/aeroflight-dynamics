@@ -35,6 +35,7 @@ export const PRESETS: AircraftPreset[] = [
       W0: 600_000,     // lb, cruise start weight (approx.)
       Wf: 150_000,     // lb, cruise fuel (approx.)
       Ct: 0.55,        // lb/lb·hr, cruise TSFC (approx.)
+      M: 0.6,          // Mach number (pull-up example condition)
     },
   },
   {
@@ -57,6 +58,7 @@ export const PRESETS: AircraftPreset[] = [
       W0: 45_000,      // lb (approx.)
       Wf: 8_000,       // lb (approx.)
       c: 0.50,         // lb/hp·hr (approx.)
+      M: 0.45,
     },
   },
   {
@@ -76,6 +78,7 @@ export const PRESETS: AircraftPreset[] = [
       W0: 2_400,       // lb
       Wf: 300,         // lb
       c: 0.45,         // lb/hp·hr
+      M: 0.18,
     },
   },
 ];

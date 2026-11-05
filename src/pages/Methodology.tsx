@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, ArrowLeft, Thermometer, Wind, Gauge, TrendingUp, ArrowDown, Mountain, Compass, FileText } from 'lucide-react';
+import { BookOpen, ArrowLeft, Thermometer, Wind, Gauge, TrendingUp, ArrowDown, Mountain, Compass, FileText, RotateCw } from 'lucide-react';
 
 const Formula = ({ children }: { children: React.ReactNode }) => (
   <p className="font-mono text-xs sm:text-sm bg-muted/50 border border-border rounded px-3 py-2 overflow-x-auto text-foreground whitespace-nowrap">
@@ -116,6 +116,17 @@ export default function Methodology() {
           <p><strong className="text-foreground">Propeller (turboprop & piston):</strong></p>
           <Formula>R_max = (η/c) · (CL/CD)max · ln(W₀ / W₁)</Formula>
           <Formula>E_max = (η/c) · √(2·ρ·S) · (CL^1.5/CD)max · (W₁^(−0.5) − W₀^(−0.5))</Formula>
+        </Section>
+
+        <Section icon={<RotateCw className="w-4 h-4 text-turboprop" />} title="Pull-Up Maneuver (simplified)">
+          <p>At a given Mach number, the true airspeed follows from the ISA speed of sound at altitude:</p>
+          <Formula>V = M · a&nbsp;&nbsp;·&nbsp;&nbsp;a = √(γ · R · T)</Formula>
+          <p>Maximum lift at CLmax and the resulting load factor:</p>
+          <Formula>q = ½ · ρ · V²&nbsp;&nbsp;·&nbsp;&nbsp;L_max = q · S · CLmax&nbsp;&nbsp;·&nbsp;&nbsp;n = L_max / W</Formula>
+          <p>Pull-up radius and turn rate (Cd0 and K are not used in this simplified model):</p>
+          <Formula>R = V² / [ g₀ · (n − 1) ]&nbsp;&nbsp;·&nbsp;&nbsp;ω = g₀ · (n − 1) / V</Formula>
+          <p>Curves of R and ω versus load factor (1.05–3.0) are plotted at the fixed speed; the marker shows the load
+            factor reached at CLmax. If n ≤ 1 the lift cannot exceed the weight and no pull-up is possible.</p>
         </Section>
 
         <Section icon={<FileText className="w-4 h-4 text-muted-foreground" />} title="Assumptions">

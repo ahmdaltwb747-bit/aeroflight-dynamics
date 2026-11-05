@@ -16,11 +16,14 @@ import {
   calculateTurbofanPerformance,
   calculateTurbopropPerformance,
   calculatePistonPerformance,
+  calculatePullUp,
   type TurbofanParams,
   type TurbopropParams,
   type PistonParams,
+  type PullUpResults,
   type PerformanceResults,
 } from '@/lib/performanceCalculations';
+import { PullUpPanel } from './PullUpPanel';
 import logo from '@/assets/logo.jpeg';
 
 export type EngineMode = 'turbofan' | 'turboprop' | 'piston';
@@ -50,6 +53,8 @@ export interface InputValues {
   Wf: number;
   Ct: number;
   c: number;
+  // Pull-Up Maneuver
+  M: number; // Mach number
 }
 
 // All values start at 0 (stored internally in Imperial units)
@@ -73,6 +78,7 @@ const defaultValues: InputValues = {
   Wf: 0,
   Ct: 0,
   c: 0,
+  M: 0,
 };
 
 export function AircraftAnalyzer() {
@@ -157,6 +163,18 @@ export function AircraftAnalyzer() {
       return calculatePistonPerformance(params);
     }
   }, [mode, inputs, hasCalculated]);
+
+  // Pull-up maneuver (independent of engine mode; needs a Mach number)
+  const pullUp = useMemo<PullUpResults | null>(() => {
+    if (!hasCalculated || inputs.M <= 0) return null;
+    return calculatePullUp({
+      W: inputs.W,
+      S: inputs.S,
+      CLmax: inputs.CLmax,
+      h: inputs.h,
+      M: inputs.M,
+    });
+  }, [inputs, hasCalculated]);
 
   const handleCalculate = () => {
     if (errors.length > 0) {
@@ -311,6 +329,7 @@ export function AircraftAnalyzer() {
                 <MetricsCards results={results} mode={mode} sys={sys} />
                 <PerformanceCharts results={results} mode={mode} sys={sys} />
                 <PerformanceTables results={results} mode={mode} sys={sys} />
+                <PullUpPanel pullUp={pullUp} sys={sys} />
                 <ResultsPanel results={results} mode={mode} sys={sys} />
                 <ExportButtons results={results} mode={mode} inputs={inputs} sys={sys} />
               </>
