@@ -123,6 +123,70 @@ export interface PerformanceResults {
   engineType: 'turbofan' | 'turboprop' | 'piston';
 }
 
+// ============= Pull-Up Maneuver =============
+
+export interface PullUpParams {
+  W: number;      // Weight (lb)
+  S: number;      // Wing area (ft²)
+  CLmax: number;  // Maximum lift coefficient
+  h: number;      // Altitude (ft)
+  M: number;      // Mach number
+}
+
+export interface PullUpCurvePoint {
+  n: number;      // Load factor
+  R: number;      // Pull-up radius (ft)
+  omega: number;  // Turn rate (rad/s)
+}
+
+export interface PullUpResults {
+  V: number;        // Flight speed (ft/s)
+  a: number;        // Speed of sound at altitude (ft/s)
+  rho: number;      // Density (slug/ft³)
+  q: number;        // Dynamic pressure (lb/ft²)
+  Lmax: number;     // Maximum lift at CLmax (lb)
+  n: number;        // Load factor at maximum lift (L/W)
+  R: number;        // Pull-up radius (ft)
+  omega: number;    // Turn rate (rad/s)
+  omegaDeg: number; // Turn rate (deg/s)
+  curve: PullUpCurvePoint[];
+  canPullUp: boolean; // false when n <= 1 (lift cannot exceed weight)
+}
+
+/**
+ * Simplified pull-up maneuver at the maximum-lift (CLmax) condition.
+ * V = M·a (ISA speed of sound), q = ½ρV², L = q·S·CLmax, n = L/W,
+ * R = V²/[g₀·(n−1)], ω = g₀·(n−1)/V. Cd0 and K are not used.
+ */
+export function calculatePullUp(params: PullUpParams): PullUpResults {
+  const { W, S, CLmax, h, M } = params;
+
+  const atm = getAtmosphere(h);
+  const a = Math.sqrt(PHYSICS.gamma * PHYSICS.R_gas * atm.T);
+  const V = M * a;
+  const q = 0.5 * atm.rho * V * V;
+  const Lmax = q * S * CLmax;
+  const n = Lmax / W;
+  const canPullUp = n > 1.0001;
+  const R = canPullUp ? (V * V) / (PHYSICS.g0 * (n - 1)) : Infinity;
+  const omega = canPullUp ? (PHYSICS.g0 * (n - 1)) / V : 0;
+
+  const curve: PullUpCurvePoint[] = [];
+  for (let ni = 1.05; ni <= 3.0001; ni += 0.05) {
+    curve.push({
+      n: Number(ni.toFixed(2)),
+      R: (V * V) / (PHYSICS.g0 * (ni - 1)),
+      omega: (PHYSICS.g0 * (ni - 1)) / V,
+    });
+  }
+
+  return {
+    V, a, rho: atm.rho, q, Lmax, n, R, omega,
+    omegaDeg: (omega * 180) / Math.PI,
+    curve, canPullUp,
+  };
+}
+
 export interface ChartDataPoint {
   V: number;
   TA: number;
