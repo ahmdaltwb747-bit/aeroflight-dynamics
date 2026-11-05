@@ -39,6 +39,10 @@ export function validateInputs(
   push('h', v.h < 0, 'Altitude (h) cannot be negative.');
   push('h', v.h > 65_000, 'Altitude (h) is above the model limit (~20 km — ISA stratosphere).');
 
+  // Pull-up maneuver (Mach number is optional — 0 skips it)
+  push('M', v.M < 0, 'Mach number (M) cannot be negative.');
+  push('M', v.M > 3, 'Mach number looks too high — typical transport values are 0.2–0.9.');
+
   // Range & endurance (common)
   push('W0', !(v.W0 > 0), `Initial weight (W₀) must be greater than 0 ${u('weight')} to compute range & endurance.`);
   push('Wf', v.Wf < 0, 'Fuel weight (Wf) cannot be negative.');

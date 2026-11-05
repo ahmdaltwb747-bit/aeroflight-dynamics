@@ -128,7 +128,6 @@ export function PullUpPanel({ pullUp, sys }: PullUpPanelProps) {
       <div className="flex items-center gap-2">
         <RotateCw className="w-5 h-5 text-turboprop" />
         <h3 className="section-title">Pull-Up Maneuver</h3>
-        <span className="text-xs text-muted-foreground ml-auto font-mono">M = {sys === 'imperial' ? '' : ''}{''}Mach</span>
       </div>
 
       {!u.canPullUp && (

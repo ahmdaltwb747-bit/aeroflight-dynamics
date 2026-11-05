@@ -1,4 +1,4 @@
-import { Plane, Gauge, Mountain, Zap, Loader2, Info, RotateCcw } from 'lucide-react';
+import { Plane, Gauge, Mountain, Zap, Loader2, Info, RotateCcw, RotateCw } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -151,6 +151,7 @@ export function ParameterInputs({
     Wf: 'Fuel weight burned during the cruise segment.',
     Ct: 'Thrust-specific fuel consumption (TSFC) for turbofan cruise.',
     c: 'Power-specific fuel consumption (PSFC) for prop engines.',
+    M: 'Flight Mach number for the pull-up maneuver. Speed of sound comes from the ISA model at the entered altitude. Leave 0 to skip the pull-up calculation.',
   };
 
   return (
@@ -273,6 +274,18 @@ export function ParameterInputs({
           <h3 className="text-sm font-bold text-info">Flight Altitude</h3>
         </div>
         <InputField label="Altitude (h)" id="h" value={inputs.h} cat="altitude" tip={tips.h} sys={sys} error={errorFor('h')} onChange={handleChange} />
+      </div>
+
+      {/* Pull-Up Maneuver */}
+      <div className="border-t border-border pt-5">
+        <div className="flex items-center gap-2 mb-3">
+          <RotateCw className="w-4 h-4 text-turboprop" />
+          <h3 className="text-sm font-bold text-turboprop">Pull-Up Maneuver</h3>
+        </div>
+        <InputField label="Mach Number (M)" id="M" value={inputs.M} step="0.05" tip={tips.M} sys={sys} error={errorFor('M')} onChange={handleChange} />
+        <p className="text-[10px] text-muted-foreground mt-1">
+          * V = M · a from the ISA speed of sound at altitude — leave 0 to skip.
+        </p>
       </div>
 
       {/* Buttons */}
